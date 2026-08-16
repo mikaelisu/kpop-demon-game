@@ -81,6 +81,7 @@ def main():
         "js/engine/particles.js",
         "js/engine/test_agent.js",
         "js/ui/test_agent_ui.js",
+        "js/entities/companion.js",
         "js/entities/player.js",
         "js/entities/enemy.js",
         "js/entities/boss.js",
@@ -92,6 +93,7 @@ def main():
         "js/audio/sfx.js",
         "js/graphics/palette.js",
         "js/graphics/sprites.js",
+        "js/ui/chopstick_feast.js",
         "test/test_runner.html"
     ]
 

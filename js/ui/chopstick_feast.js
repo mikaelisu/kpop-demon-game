@@ -177,34 +177,44 @@ class ChopstickFeastGame {
     if (input.isDown()) this.targetY += moveSpeed * dt;
 
     // Bounds Clamping (Keep inside dining view)
-    this.targetX = Math.max(100, Math.min(284, this.targetX));
-    this.targetY = Math.max(30, Math.min(185, this.targetY));
+    this.targetX = Math.max(80, Math.min(304, this.targetX));
+    this.targetY = Math.max(30, Math.min(195, this.targetY));
 
     // Smooth Lerp Chopstick Position
-    this.chopstickX += (this.targetX - this.chopstickX) * (dt * 14);
-    this.chopstickY += (this.targetY - this.chopstickY) * (dt * 14);
+    this.chopstickX += (this.targetX - this.chopstickX) * (dt * 18);
+    this.chopstickY += (this.targetY - this.chopstickY) * (dt * 18);
 
-    // Chopstick Pinch Trigger (Attack Button, Jump Button, Slurp Button, or Direct Click)
+    // Auto-lifting animated food item towards mouth (One-tap slurp animation)
+    if (this.isLifting && this.heldItem) {
+      this.targetY -= 140 * dt;
+      this.targetX += (192 - this.targetX) * (dt * 8);
+      if (this.chopstickY < 80) {
+        this.isLifting = false;
+        this.executeSlurp(sfx, particles, player);
+      }
+    }
+
+    // Chopstick Pinch Trigger (Attack Button, Jump Button, Slurp Button)
     const isPinchingNow = input.isAttack() || input.isJump() || input.isSlurp() || input.isTouchPressed;
 
     if (isPinchingNow && !this.isPinched) {
       this.isPinched = true;
-      this.tryGrabFood(sfx, particles);
+      this.tryGrabFood(this.targetX, this.targetY, sfx, particles);
     } else if (!isPinchingNow && this.isPinched) {
       this.isPinched = false;
-      // If holding an item and moved it up towards idol mouth (Y < 75), slurp it!
-      if (this.heldItem) {
-        if (this.chopstickY < 85) {
+      if (this.heldItem && !this.isLifting) {
+        if (this.chopstickY < 95) {
           this.executeSlurp(sfx, particles, player);
         } else {
-          // Drop back into bowl smoothly
+          // Drop or auto-lift
           this.heldItem = null;
         }
       }
     }
 
-    // Auto-Slurp when dragging food item directly up into mouth
-    if (this.heldItem && this.chopstickY < 70 && !this.isSlurping) {
+    // Auto-Slurp when dragging food item directly up into mouth area (Y < 90)
+    if (this.heldItem && this.chopstickY < 90 && !this.isSlurping) {
+      this.isLifting = false;
       this.executeSlurp(sfx, particles, player);
     }
 
@@ -217,22 +227,60 @@ class ChopstickFeastGame {
     }
   }
 
-  tryGrabFood(sfx, particles) {
+  tryGrabFood(pointerX, pointerY, sfx, particles) {
     if (this.heldItem) return;
 
-    // Check collision between chopstick tips and closest food item
-    const tipX = this.chopstickX;
-    const tipY = this.chopstickY;
+    // Use current pointer/target coordinates or chopstick tips
+    const searchX = pointerX !== undefined ? pointerX : this.targetX;
+    const searchY = pointerY !== undefined ? pointerY : this.targetY;
+
+    let closestItem = null;
+    let closestDist = 9999;
 
     for (const item of this.foodItems) {
       if (item.eaten) continue;
-      const dist = Math.hypot(item.x - tipX, item.y - tipY);
-      if (dist < item.radius + 10) {
-        this.heldItem = item;
-        if (sfx) sfx.playSlash(1);
-        if (particles) particles.spawnSparkleBurst(item.x, item.y, 6, '#ffe600');
-        break;
+      const dist = Math.hypot(item.x - searchX, item.y - searchY);
+      // Generous 38px touch radius for effortless 4-year-old interaction!
+      if (dist < 38 && dist < closestDist) {
+        closestDist = dist;
+        closestItem = item;
       }
+    }
+
+    if (closestItem) {
+      this.heldItem = closestItem;
+      this.isPinched = true;
+      this.chopstickX = closestItem.x;
+      this.chopstickY = closestItem.y - 8;
+      this.targetX = closestItem.x;
+      this.targetY = closestItem.y - 8;
+
+      if (sfx) {
+        sfx.playSlash(1);
+      }
+      if (particles) {
+        particles.spawnSparkleBurst(closestItem.x, closestItem.y, 8, '#ffe600');
+      }
+    }
+  }
+
+  handleDirectTap(x, y, sfx, particles, player) {
+    // If food is already held, tap feeds it immediately!
+    if (this.heldItem) {
+      this.executeSlurp(sfx, particles, player);
+      return;
+    }
+
+    // Try grabbing food at tap position
+    this.targetX = x;
+    this.targetY = y;
+    this.chopstickX = x;
+    this.chopstickY = y;
+    this.tryGrabFood(x, y, sfx, particles);
+
+    // If successfully grabbed by tap, trigger automatic smooth lift to mouth!
+    if (this.heldItem) {
+      this.isLifting = true;
     }
   }
 
@@ -242,8 +290,9 @@ class ChopstickFeastGame {
     const item = this.heldItem;
     item.eaten = true;
     this.heldItem = null;
+    this.isLifting = false;
     this.isSlurping = true;
-    this.slurpTimer = 0.45;
+    this.slurpTimer = 0.5;
     this.slurpCount++;
 
     // Satisfying sound & sparkles
@@ -255,7 +304,7 @@ class ChopstickFeastGame {
 
     if (particles) {
       particles.spawnRamenSlurpFX(192, 58);
-      particles.spawnSparkleBurst(192, 58, 20, '#ff007f');
+      particles.spawnSparkleBurst(192, 58, 24, '#ff007f');
     }
 
     // Heal player if present

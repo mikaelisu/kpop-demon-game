@@ -43,6 +43,7 @@ class Player {
 
     // Platforming Helpers (Kid-Friendly Ninja Gaiden feel)
     this.onGround = false;
+    this.canDoubleJump = this.charId === 'rumi' || this.charId === 'luna';
     this.coyoteTimer = 0;
     this.jumpBufferTimer = 0;
     this.touchingWallLeft = false;
@@ -302,8 +303,8 @@ class Player {
   }
 
   getSwordColor() {
-    if (this.spicyTimer > 0) return '#ff3300';
     if (this.rainbowFeverTimer > 0) return '#ffe600';
+    if (this.spicyTimer > 0) return '#ff3300';
     if (this.charId === 'mira' || this.charId === 'minho') return '#ffaa00';
     if (this.charId === 'zoey' || this.charId === 'hana') return '#ff1493';
     if (this.charId === 'jinu' || this.charId === 'felix') return '#cc00ff';

@@ -407,7 +407,11 @@ class TestAgent {
         playPlayerHurt: () => {},
         playBossRoar: () => {},
         playChopsticks: () => {},
-        playWallKick: () => {}
+        playWallKick: () => {},
+        playVocalHyeah: () => {},
+        playVocalDaebak: () => {},
+        playLanternBurst: () => {},
+        playCrystalShatter: () => {}
       };
       const mockParticles = {
         spawnSlashTrail: () => {},
@@ -446,6 +450,39 @@ class TestAgent {
       pSlurp.triggerSlurpSuper(mockSFX, mockParticles, { shake: () => {} }, superProjList);
       assert('Combat System', 'Slurp Super triggers 360 shockwave (8 projectiles)', superProjList.length === 8);
       assert('Combat System', 'Slurp Super consumes slurp meter to 0', pSlurp.slurpMeter === 0);
+
+      // Mini Slurp Burst
+      const pMini = new Player('luna');
+      pMini.hp = 2;
+      pMini.slurpMeter = 20;
+      const miniProjList = [];
+      pMini.triggerMiniSlurp(mockSFX, mockParticles, miniProjList);
+      assert('Combat System', 'Mini Slurp heals 1 heart and spawns 3 forward projectiles', pMini.hp === 3 && miniProjList.length === 3);
+
+      // Character Signature 3rd Combo Moves
+      const pZoey = new Player('zoey');
+      pZoey.combo = 3;
+      const zoeyProjs = [];
+      pZoey.executeAttack(mockSFX, mockParticles, zoeyProjs);
+      assert('Character Combos', 'Zoey combo 3 spawns twin pink star daggers', zoeyProjs.length === 2 && zoeyProjs[0].color === '#ff1493');
+
+      const pMira = new Player('mira');
+      pMira.combo = 3;
+      const miraProjs = [];
+      pMira.executeAttack(mockSFX, mockParticles, miraProjs);
+      assert('Character Combos', 'Mira combo 3 spawns golden flame shockwave', miraProjs.length === 1 && miraProjs[0].color === '#ffaa00');
+
+      const pJinu = new Player('jinu');
+      pJinu.combo = 3;
+      const jinuProjs = [];
+      pJinu.executeAttack(mockSFX, mockParticles, jinuProjs);
+      assert('Character Combos', 'Jinu combo 3 spawns violet lightning bolt', jinuProjs.length === 1 && jinuProjs[0].color === '#cc00ff');
+
+      // Rumi Double Jump Mechanic
+      const pRumi = new Player('rumi');
+      assert('Player System', 'Rumi has canDoubleJump initialized to true', pRumi.canDoubleJump === true);
+      pRumi.onSpringBounce(mockSFX, mockParticles);
+      assert('Player System', 'Spring bounce resets double jump and sets jump state', pRumi.state === 'jump' && pRumi.canDoubleJump === true);
 
       // Assist Mode Damage vs Normal Mode Damage
       const pAssist = new Player('luna');
@@ -490,6 +527,7 @@ class TestAgent {
       assert('Boss System', 'Shadow Demon King boss init with 12 HP', bossKing.type === 'shadow_king' && bossKing.hp === 12);
 
       // Boss Attack Telegraph
+      bossDJ.isActive = true;
       bossDJ.attackTimer = 0;
       bossDJ.update(0.01, pNormal, [], mockParticles, mockSFX, { shake: () => {} });
       assert('Boss System', 'Boss transitions to telegraph state for kids', bossDJ.state === 'telegraph' && bossDJ.telegraphTimer > 0);
@@ -506,13 +544,14 @@ class TestAgent {
       });
 
       // -----------------------------------------------------------------------
-      // SUITE 5: Collectibles
+      // SUITE 5: Collectibles & Destructibles
       // -----------------------------------------------------------------------
       const colRamen = new Collectible(50, 50, 'ramen_normal');
       const colSpicy = new Collectible(50, 50, 'ramen_spicy');
       const colRainbow = new Collectible(50, 50, 'ramen_rainbow');
       const colStar = new Collectible(50, 50, 'star');
       const colChopsticks = new Collectible(50, 50, 'chopsticks');
+      const colLantern = new Collectible(50, 50, 'lantern');
 
       pLuna.hp = 2;
       colRamen.onCollect(pLuna, mockSFX, mockParticles);
@@ -524,8 +563,28 @@ class TestAgent {
       colChopsticks.onCollect(pLuna, mockSFX, mockParticles);
       assert('Collectibles', 'Golden Chopsticks unlock golden chopsticks flag', pLuna.hasGoldenChopsticks === true);
 
+      const lanternDrops = [];
+      colLantern.onCollect(pLuna, mockSFX, mockParticles, lanternDrops);
+      assert('Collectibles', 'Destructible lantern shatters and spawns ramen drop', colLantern.collected && lanternDrops.length > 0);
+
       // -----------------------------------------------------------------------
-      // SUITE 6: Audio Chiptune Synthesizer
+      // SUITE 6: Companions System (Demon Cat Bogi & Demon Raven Karasu)
+      // -----------------------------------------------------------------------
+      const companions = new CompanionManager();
+      assert('Companion System', 'CompanionManager instantiation', companions instanceof CompanionManager);
+      assert('Companion System', 'Demon Cat (Bogi) familiar initialized', companions.cat instanceof DemonCatCompanion);
+      assert('Companion System', 'Demon Raven (Karasu) familiar initialized', companions.raven instanceof DemonRavenCompanion);
+      
+      // Tap Cheer Interaction
+      const tapHandled = companions.handleTap(companions.cat.x, companions.cat.y, { x: 0, y: 0 }, mockSFX, mockParticles);
+      assert('Companion System', 'Direct tap interaction cheers companion', tapHandled === true);
+
+      // Slurp Synergy Super
+      companions.triggerSlurpSynergy(pLuna, [imp], bossDJ, [], mockSFX, mockParticles);
+      assert('Companion System', 'Slurp Synergy triggers Cat Spirit Flame Orbs', companions.projectiles.length >= 8);
+
+      // -----------------------------------------------------------------------
+      // SUITE 7: Audio Chiptune Synthesizer
       // -----------------------------------------------------------------------
       const synth = new ChiptuneSynth();
       assert('Audio Engine', 'ChiptuneSynth instantiation', synth instanceof ChiptuneSynth);
@@ -538,7 +597,7 @@ class TestAgent {
       assert('Audio Engine', 'MusicPlayer defines Victory track', music.getTrackData('victory').tempo > 0);
 
       // -----------------------------------------------------------------------
-      // SUITE 7: Photocard Album & Ramen Minigame
+      // SUITE 8: Photocard Album & Ramen Minigame
       // -----------------------------------------------------------------------
       const album = new PhotocardAlbum();
       assert('Photocard Album', 'Album has at least 6 collectible photocards', album.cards.length >= 6);
@@ -552,7 +611,7 @@ class TestAgent {
       assert('Ramen Minigame', 'Minigame catches falling ingredients and scores points', minigame.score === 35);
 
       // -----------------------------------------------------------------------
-      // SUITE 8: Input Edge-Trigger & Injection
+      // SUITE 9: Input Edge-Trigger & Injection
       // -----------------------------------------------------------------------
       const input = new InputManager();
       assert('Input System', 'InputManager has edge-trigger methods', typeof input.justLeft === 'function' && typeof input.justRight === 'function');
@@ -562,7 +621,7 @@ class TestAgent {
       assert('Input System', 'Injected inputs cleared', input.isJump() === false);
 
       // -----------------------------------------------------------------------
-      // SUITE 9: Chopstick Ramen Feast Interactive Engine & Courses
+      // SUITE 10: Chopstick Ramen Feast Interactive Engine & Courses
       // -----------------------------------------------------------------------
       const feastGame = new ChopstickFeastGame();
       assert('Chopstick Feast', 'ChopstickFeastGame instantiation', feastGame instanceof ChopstickFeastGame);

@@ -188,17 +188,20 @@ class GameApp {
 
     this.canvas.addEventListener('pointermove', handlePointerMove);
     this.canvas.addEventListener('pointerdown', (e) => {
-      handlePointerMove(e);
       if (this.state === 'chopstick_feast' && this.chopstickFeast) {
-        this.chopstickFeast.isPinched = true;
-        this.chopstickFeast.tryGrabFood(this.sfx, this.particles);
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.virtualWidth / rect.width;
+        const scaleY = this.virtualHeight / rect.height;
+        const pointerX = (e.clientX - rect.left) * scaleX;
+        const pointerY = (e.clientY - rect.top) * scaleY;
+        this.chopstickFeast.handleDirectTap(pointerX, pointerY, this.sfx, this.particles, this.player);
       }
     });
     this.canvas.addEventListener('pointerup', () => {
       if (this.state === 'chopstick_feast' && this.chopstickFeast) {
         this.chopstickFeast.isPinched = false;
-        if (this.chopstickFeast.heldItem) {
-          if (this.chopstickFeast.chopstickY < 85) {
+        if (this.chopstickFeast.heldItem && !this.chopstickFeast.isLifting) {
+          if (this.chopstickFeast.chopstickY < 95) {
             this.chopstickFeast.executeSlurp(this.sfx, this.particles, this.player);
           } else {
             this.chopstickFeast.heldItem = null;
@@ -525,7 +528,7 @@ class GameApp {
         if (this.sfx) this.sfx.playStar();
       }
     } else if (this.state === 'chopstick_feast') {
-      this.chopstickFeast.setPointerPos(clickX, clickY, true);
+      this.chopstickFeast.handleDirectTap(clickX, clickY, this.sfx, this.particles, this.player);
     } else if (this.state === 'album') {
       if (clickX < this.virtualWidth * 0.3) {
         this.album.selectedCardIndex = (this.album.selectedCardIndex - 1 + this.album.cards.length) % this.album.cards.length;
