@@ -31,6 +31,7 @@ class Player {
     // Timers & Buffs
     this.animTimer = 0;
     this.attackTimer = 0;
+    this.attackBufferTimer = 0;
     this.combo = 1;
     this.comboResetTimer = 0;
     this.invincibleTimer = 0;
@@ -78,6 +79,13 @@ class Player {
       this.jumpBufferTimer = 0.22;
     } else if (this.jumpBufferTimer > 0) {
       this.jumpBufferTimer -= dt;
+    }
+
+    // Attack Input Buffering
+    if (input.justAttack() || input.isAttack()) {
+      this.attackBufferTimer = 0.25;
+    } else if (this.attackBufferTimer > 0) {
+      this.attackBufferTimer -= dt;
     }
 
     // Slurp Super Animation
@@ -145,9 +153,10 @@ class Player {
       }
     }
 
-    // Attack / Glowing Sword Slash
-    if (input.justAttack() && this.attackTimer <= 0) {
+    // Execute Buffered Attack / Glowing Sword Slash
+    if (this.attackBufferTimer > 0 && this.attackTimer <= 0 && this.state !== 'slurp') {
       this.executeAttack(sfx, particles, playerProjectiles);
+      this.attackBufferTimer = 0;
     }
 
     if (this.attackTimer > 0) {
@@ -174,7 +183,7 @@ class Player {
 
   executeAttack(sfx, particles, playerProjectiles) {
     this.state = 'attack';
-    this.attackTimer = 0.22;
+    this.attackTimer = 0.18; // Fast, snappy 0.18s combo slash
 
     const swordColor = this.getSwordColor();
     if (sfx) sfx.playSlash(this.combo);
@@ -183,12 +192,12 @@ class Player {
     // Spicy Mode Fire Wave Projectile
     if (this.spicyTimer > 0 && playerProjectiles) {
       const dir = this.facingRight ? 1 : -1;
-      playerProjectiles.push(new PlayerSlashWave(this.x + (this.facingRight ? 24 : -10), this.y + 6, dir * 5.0, '#ff3300'));
+      playerProjectiles.push(new PlayerSlashWave(this.x + (this.facingRight ? 26 : -12), this.y + 4, dir * 5.5, '#ff3300'));
     }
 
     // Cycle 3-hit K-Pop combo
     this.combo = (this.combo % 3) + 1;
-    this.comboResetTimer = 0.7;
+    this.comboResetTimer = 0.8;
   }
 
   triggerSlurpSuper(sfx, particles, camera, playerProjectiles) {
@@ -231,10 +240,10 @@ class Player {
 
   getSwordHitbox() {
     if (this.state !== 'attack') return null;
-    const width = 36;
-    const height = 36;
-    const x = this.facingRight ? this.x + 14 : this.x - width + 8;
-    const y = this.y - 2;
+    const width = 58;
+    const height = 48;
+    const x = this.facingRight ? this.x + 6 : this.x - width + 22;
+    const y = this.y - 6;
     return { x, y, width, height };
   }
 

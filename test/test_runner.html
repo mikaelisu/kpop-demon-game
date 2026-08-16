@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>K-Pop Demon Hunters - Automated QA Test Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0a0216;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      padding: 30px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .test-container {
+      width: 100%;
+      max-width: 900px;
+      background: #15082b;
+      border: 3px solid #39ff14;
+      border-radius: 12px;
+      box-shadow: 0 0 35px rgba(57, 255, 20, 0.3);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #39ff14;
+      padding-bottom: 16px;
+    }
+    h1 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      color: #ffe600;
+    }
+    .badge {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: #39ff14;
+      color: #000;
+    }
+    .summary-card {
+      display: flex;
+      justify-content: space-between;
+      background: #200d3d;
+      border: 1px solid #4a2877;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+    }
+    .summary-card.pass { border-color: #39ff14; color: #39ff14; background: rgba(57, 255, 20, 0.1); }
+    .summary-card.fail { border-color: #ff0055; color: #ff0055; background: rgba(255, 0, 85, 0.1); }
+    .btn-run {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      padding: 10px 18px;
+      background: #39ff14;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-run:hover { box-shadow: 0 0 15px #39ff14; }
+    .suite-box {
+      background: #110522;
+      border: 1px solid #2f194e;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .suite-header {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: #00f0ff;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #2f194e;
+      padding-bottom: 6px;
+    }
+    .test-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px dotted rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+    }
+    .test-row:last-child { border-bottom: none; }
+    .status-icon { font-weight: bold; font-family: monospace; }
+    .test-row.pass .status-icon { color: #39ff14; }
+    .test-row.fail .status-icon { color: #ff0055; }
+    .test-desc { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <header>
+      <div>
+        <h1>🤖 K-POP DEMON HUNTERS TEST SUITE</h1>
+        <p style="color: #a89bb9; font-size: 12px; margin-top: 6px;">50+ Automated Assertions for Regression & Integration Testing</p>
+      </div>
+      <button id="btn-run-all" class="btn-run">▶ RUN TESTS</button>
+    </header>
+
+    <div id="summary-box" class="summary-card">
+      <span id="summary-status">Ready to execute tests...</span>
+      <span id="summary-stats">0 / 0</span>
+    </div>
+
+    <div id="results-container"></div>
+  </div>
+
+  <!-- Game Scripts -->
+  <script src="../js/graphics/palette.js"></script>
+  <script src="../js/graphics/sprites.js"></script>
+  <script src="../js/audio/chiptune.js"></script>
+  <script src="../js/audio/sfx.js"></script>
+  <script src="../js/audio/music.js"></script>
+  <script src="../js/engine/input.js"></script>
+  <script src="../js/engine/particles.js"></script>
+  <script src="../js/engine/physics.js"></script>
+  <script src="../js/engine/camera.js"></script>
+  <script src="../js/engine/test_agent.js"></script>
+  <script src="../js/entities/collectible.js"></script>
+  <script src="../js/entities/enemy.js"></script>
+  <script src="../js/entities/boss.js"></script>
+  <script src="../js/entities/player.js"></script>
+  <script src="../js/levels/level_data.js"></script>
+  <script src="../js/levels/level_manager.js"></script>
+  <script src="../js/ui/hud.js"></script>
+  <script src="../js/ui/menus.js"></script>
+  <script src="../js/ui/album.js"></script>
+  <script src="../js/ui/ramen_game.js"></script>
+
+  <script>
+    const agent = new TestAgent(null);
+
+    async function executeTests() {
+      const stats = await agent.runAllTests();
+      const summaryBox = document.getElementById('summary-box');
+      const summaryStatus = document.getElementById('summary-status');
+      const summaryStats = document.getElementById('summary-stats');
+      const container = document.getElementById('results-container');
+
+      const isPass = stats.failed === 0;
+      summaryBox.className = `summary-card ${isPass ? 'pass' : 'fail'}`;
+      summaryStatus.textContent = isPass ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED';
+      summaryStats.textContent = `${stats.passed} / ${stats.total} Passed (${stats.duration}ms)`;
+
+      const grouped = {};
+      agent.testResults.forEach(r => {
+        if (!grouped[r.suite]) grouped[r.suite] = [];
+        grouped[r.suite].push(r);
+      });
+
+      let html = '';
+      for (const [suite, tests] of Object.entries(grouped)) {
+        html += `<div class="suite-box"><div class="suite-header">📂 ${suite}</div>`;
+        tests.forEach(t => {
+          html += `
+            <div class="test-row ${t.passed ? 'pass' : 'fail'}">
+              <span class="status-icon">${t.passed ? '✓' : '✗'}</span>
+              <span class="test-desc">${t.name}</span>
+              ${t.details ? `<span style="color:#ff77aa; font-size:11px;">${t.details}</span>` : ''}
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+      container.innerHTML = html;
+
+      // Expose globally for automated headless test runners
+      window.__TEST_RESULTS__ = agent.generateReport();
+    }
+
+    document.getElementById('btn-run-all').addEventListener('click', executeTests);
+    window.addEventListener('DOMContentLoaded', executeTests);
+  </script>
+</body>
+</html>

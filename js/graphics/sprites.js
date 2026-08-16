@@ -264,26 +264,80 @@ class SpriteRenderer {
     ctx.fillStyle = hairColor;
     // Hair style per Hunter
     if (charId === 'rumi' || charId === 'luna') {
-      // Rumi: Double anime space buns & bangs
-      ctx.fillRect(6 * scale, (headY - 3) * scale, 3 * scale, 3 * scale);
-      ctx.fillRect(15 * scale, (headY - 3) * scale, 3 * scale, 3 * scale);
-      ctx.fillRect(7 * scale, headY * scale, 10 * scale, 6 * scale);
+      // RUMI: Iconic Long Braided Ponytail with Golden Ribbon & Cyan Glow Tip
+      // Front Hair & Bangs
+      ctx.fillRect(7 * scale, (headY - 2) * scale, 10 * scale, 5 * scale);
+      ctx.fillRect(6 * scale, (headY) * scale, 2 * scale, 6 * scale); // Side bangs left
+      ctx.fillRect(15 * scale, (headY) * scale, 2 * scale, 6 * scale); // Side bangs right
+
+      // High Ponytail Ribbon Tie
+      ctx.fillStyle = '#ffd700'; // Gold hairband
+      ctx.fillRect(4 * scale, (headY - 2) * scale, 3 * scale, 3 * scale);
+      ctx.fillStyle = '#00f0ff'; // Cyan cyber gem
+      ctx.fillRect(5 * scale, (headY - 1) * scale, 1 * scale, 1 * scale);
+
+      // Long Braided Ponytail with Dynamic Physics
+      // Calculates braid sway angle based on motion and state
+      let braidSway = 0;
+      if (state === 'run') {
+        braidSway = Math.sin(animTimer * 14) * 3 - 4; // Flows back while running
+      } else if (isJumping) {
+        braidSway = -6; // Swept up/back when jumping
+      } else if (isAttacking) {
+        braidSway = combo === 2 ? -8 : 4; // Whips during sword slash
+      } else {
+        braidSway = Math.sin(animTimer * 4) * 1.5; // Idle breathing sway
+      }
+
+      // 6 Interlocking Braid Segments Cascading Down Past the Waist
+      const braidSegments = [
+        { x: 3 + braidSway * 0.2, y: headY + 1, w: 4, h: 3 },
+        { x: 2 + braidSway * 0.4, y: headY + 4, w: 4, h: 3 },
+        { x: 1 + braidSway * 0.6, y: headY + 7, w: 3, h: 3 },
+        { x: 0 + braidSway * 0.8, y: headY + 10, w: 3, h: 3 },
+        { x: -1 + braidSway * 1.0, y: headY + 13, w: 3, h: 3 },
+        { x: -1 + braidSway * 1.1, y: headY + 16, w: 3, h: 3 },
+        { x: 0 + braidSway * 1.2, y: headY + 19, w: 2, h: 3 } // Long tail tip
+      ];
+
+      braidSegments.forEach((seg, idx) => {
+        // Alternating braid weave shades
+        ctx.fillStyle = (idx % 2 === 0) ? '#ff3388' : '#ff77bb';
+        ctx.fillRect(Math.round(seg.x) * scale, Math.round(seg.y) * scale, seg.w * scale, seg.h * scale);
+
+        // Golden weave ring accent
+        if (idx === 2 || idx === 4) {
+          ctx.fillStyle = '#ffd700';
+          ctx.fillRect(Math.round(seg.x) * scale, Math.round(seg.y + 1) * scale, seg.w * scale, 1 * scale);
+        }
+      });
+
+      // Glowing Neon Cyan Braid Tip Charm
+      const lastSeg = braidSegments[braidSegments.length - 1];
+      ctx.fillStyle = '#00f0ff';
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 8;
+      ctx.fillRect(Math.round(lastSeg.x) * scale, Math.round(lastSeg.y + 3) * scale, 2 * scale, 2 * scale);
+      ctx.shadowBlur = 0;
+
     } else if (charId === 'mira' || charId === 'minho') {
       // Mira: Cool dancer layered haircut & headband
+      ctx.fillStyle = hairColor;
       ctx.fillRect(7 * scale, (headY - 2) * scale, 10 * scale, 6 * scale);
       ctx.fillRect(5 * scale, (headY - 1) * scale, 3 * scale, 3 * scale);
       ctx.fillRect(16 * scale, (headY - 1) * scale, 3 * scale, 3 * scale);
     } else if (charId === 'zoey' || charId === 'hana') {
       // Zoey: Twin high ponytails with star hairclips
+      ctx.fillStyle = hairColor;
       ctx.fillRect(5 * scale, (headY - 3) * scale, 3 * scale, 5 * scale);
       ctx.fillRect(16 * scale, (headY - 3) * scale, 3 * scale, 5 * scale);
       ctx.fillRect(7 * scale, headY * scale, 10 * scale, 6 * scale);
       // Star clip
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(6 * scale, (headY - 1) * scale, 2 * scale, 2 * scale);
-      ctx.fillStyle = hairColor;
     } else {
       // Jinu: Saja Boys idol styled side-swept waves
+      ctx.fillStyle = hairColor;
       ctx.fillRect(7 * scale, (headY - 2) * scale, 11 * scale, 6 * scale);
       ctx.fillRect(16 * scale, headY * scale, 3 * scale, 4 * scale);
     }
@@ -358,51 +412,53 @@ class SpriteRenderer {
   drawGlowingSwordSlash(ctx, comboIndex, color, scale) {
     ctx.save();
     ctx.shadowColor = color;
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 16;
 
     // Glowing Neon Blade in front
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = color;
-    ctx.lineWidth = 3 * scale;
+    ctx.lineWidth = 4 * scale;
 
     if (comboIndex === 1) {
-      // Horizontal forward high-speed slash
+      // Combo 1: Giant Horizontal High-Speed Neon Crescent Slash
       ctx.beginPath();
-      ctx.arc(14 * scale, 12 * scale, 14 * scale, -Math.PI / 4, Math.PI / 4);
+      ctx.arc(14 * scale, 12 * scale, 18 * scale, -Math.PI / 3, Math.PI / 3);
       ctx.stroke();
 
       // Energy Slash Blade
       ctx.fillStyle = color;
-      ctx.fillRect(16 * scale, 10 * scale, 16 * scale, 4 * scale);
+      ctx.fillRect(16 * scale, 8 * scale, 20 * scale, 6 * scale);
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(17 * scale, 11 * scale, 14 * scale, 2 * scale);
+      ctx.fillRect(17 * scale, 9 * scale, 18 * scale, 4 * scale);
     } else if (comboIndex === 2) {
-      // Upward Crescent Rising Slash
+      // Combo 2: Giant Upward Crescent Rising Lunar Slash
       ctx.beginPath();
-      ctx.arc(14 * scale, 12 * scale, 16 * scale, -Math.PI / 2, 0.2);
+      ctx.arc(14 * scale, 12 * scale, 20 * scale, -Math.PI / 2, 0.3);
       ctx.stroke();
 
       ctx.fillStyle = color;
-      ctx.fillRect(14 * scale, 2 * scale, 6 * scale, 18 * scale);
+      ctx.fillRect(14 * scale, 0, 8 * scale, 22 * scale);
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(15 * scale, 4 * scale, 4 * scale, 14 * scale);
+      ctx.fillRect(15 * scale, 2 * scale, 6 * scale, 18 * scale);
     } else {
-      // Combo 3: 360 Full Cyclone K-Pop Sword Spin
+      // Combo 3: 360° Cyclone K-Pop Sword Finisher Spin
       ctx.beginPath();
-      ctx.arc(12 * scale, 12 * scale, 18 * scale, 0, Math.PI * 2);
+      ctx.arc(12 * scale, 12 * scale, 22 * scale, 0, Math.PI * 2);
       ctx.stroke();
 
       ctx.fillStyle = color;
-      ctx.fillRect(0, 10 * scale, 26 * scale, 4 * scale);
-      ctx.fillRect(10 * scale, 0, 4 * scale, 26 * scale);
+      ctx.fillRect(-2 * scale, 8 * scale, 30 * scale, 6 * scale);
+      ctx.fillRect(8 * scale, -2 * scale, 6 * scale, 30 * scale);
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(2 * scale, 11 * scale, 22 * scale, 2 * scale);
+      ctx.fillRect(0, 9 * scale, 26 * scale, 4 * scale);
+      ctx.fillRect(9 * scale, 0, 4 * scale, 26 * scale);
     }
 
-    // Sparkles on sword tip
+    // Dynamic glowing sparkles on sword tip
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(28 * scale, 8 * scale, 2 * scale, 2 * scale);
-    ctx.fillRect(26 * scale, 14 * scale, 2 * scale, 2 * scale);
+    ctx.fillRect(32 * scale, 6 * scale, 3 * scale, 3 * scale);
+    ctx.fillRect(30 * scale, 16 * scale, 3 * scale, 3 * scale);
+    ctx.fillRect(24 * scale, 22 * scale, 2 * scale, 2 * scale);
     ctx.restore();
   }
 

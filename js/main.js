@@ -153,8 +153,14 @@ class GameApp {
   }
 
   gameLoop(currentTime) {
-    const dt = Math.min((currentTime - this.lastTime) / 1000, 0.05); // Cap delta time
+    const rawDt = Math.min((currentTime - this.lastTime) / 1000, 0.05); // Cap delta time
     this.lastTime = currentTime;
+    const dt = rawDt * (this.gameSpeed || 1.0);
+
+    // Update Test Agent AI (if active)
+    if (window.testAgent && window.testAgent.enabled) {
+      window.testAgent.update(dt);
+    }
 
     this.update(dt);
     this.render();
@@ -164,6 +170,15 @@ class GameApp {
 
   update(dt) {
     this.input.update();
+
+    // God Mode & Cheats for QA
+    if (this.godMode) {
+      this.player.hp = this.player.maxHp;
+      this.player.invincibleTimer = 1.0;
+    }
+    if (this.infiniteSlurp) {
+      this.player.slurpMeter = this.player.maxSlurpMeter;
+    }
 
     // =========================================================================
     // STATE: TITLE SCREEN
@@ -188,10 +203,10 @@ class GameApp {
     else if (this.state === 'character_select') {
       this.menus.update(dt);
 
-      if (this.input.isLeft() && !this.input.prevKeys['ArrowLeft'] && !this.input.prevKeys['KeyA']) {
+      if (this.input.justLeft()) {
         this.menus.selectedCharIndex = (this.menus.selectedCharIndex - 1 + this.menus.characters.length) % this.menus.characters.length;
         if (this.sfx) this.sfx.playJump();
-      } else if (this.input.isRight() && !this.input.prevKeys['ArrowRight'] && !this.input.prevKeys['KeyD']) {
+      } else if (this.input.justRight()) {
         this.menus.selectedCharIndex = (this.menus.selectedCharIndex + 1) % this.menus.characters.length;
         if (this.sfx) this.sfx.playJump();
       }
@@ -211,10 +226,10 @@ class GameApp {
     else if (this.state === 'stage_select') {
       this.menus.update(dt);
 
-      if (this.input.isLeft() && !this.input.prevKeys['ArrowLeft'] && !this.input.prevKeys['KeyA']) {
+      if (this.input.justLeft()) {
         this.menus.selectedStageIndex = (this.menus.selectedStageIndex - 1 + STAGES_DATA.length) % STAGES_DATA.length;
         if (this.sfx) this.sfx.playJump();
-      } else if (this.input.isRight() && !this.input.prevKeys['ArrowRight'] && !this.input.prevKeys['KeyD']) {
+      } else if (this.input.justRight()) {
         this.menus.selectedStageIndex = (this.menus.selectedStageIndex + 1) % STAGES_DATA.length;
         if (this.sfx) this.sfx.playJump();
       }
@@ -303,10 +318,10 @@ class GameApp {
     // =========================================================================
     else if (this.state === 'album') {
       this.album.update(dt);
-      if (this.input.isLeft() && !this.input.prevKeys['ArrowLeft'] && !this.input.prevKeys['KeyA']) {
+      if (this.input.justLeft()) {
         this.album.selectedCardIndex = (this.album.selectedCardIndex - 1 + this.album.cards.length) % this.album.cards.length;
         if (this.sfx) this.sfx.playJump();
-      } else if (this.input.isRight() && !this.input.prevKeys['ArrowRight'] && !this.input.prevKeys['KeyD']) {
+      } else if (this.input.justRight()) {
         this.album.selectedCardIndex = (this.album.selectedCardIndex + 1) % this.album.cards.length;
         if (this.sfx) this.sfx.playJump();
       }
@@ -453,11 +468,25 @@ class GameApp {
       // Render Menus (Title, Character Select, Stage Select, Game Over, Win)
       this.menus.draw(this.ctx, this.spriteRenderer, this.player, this.virtualWidth, this.virtualHeight);
     }
+
+    // 7. Test Agent QA Dashboard HUD (if active)
+    if (window.testAgentUI) {
+      window.testAgentUI.draw(this.ctx, this.virtualWidth, this.virtualHeight);
+    }
   }
 }
 
 // Launch Game on Load
 window.addEventListener('DOMContentLoaded', () => {
   const game = new GameApp();
+  window.gameApp = game;
   game.start();
+
+  // Initialize Test Agent & QA UI Dashboard if loaded
+  if (typeof TestAgent !== 'undefined') {
+    window.testAgent = new TestAgent(game);
+    if (typeof TestAgentUI !== 'undefined') {
+      window.testAgentUI = new TestAgentUI(game, window.testAgent);
+    }
+  }
 });

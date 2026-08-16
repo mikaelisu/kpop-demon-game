@@ -1,0 +1,331 @@
+/**
+ * K-POP DEMON HUNTERS - Level Data & Stage Definitions
+ * 4 handcrafted retro 8-bit stages with tilemaps, enemy spawns, ramen spots, and boss arenas.
+ */
+
+// Helper to generate a stage grid
+function createStageGrid(cols, rows, groundRow = 10) {
+  const grid = [];
+  for (let r = 0; r < rows; r++) {
+    const row = [];
+    for (let c = 0; c < cols; c++) {
+      if (r >= groundRow) {
+        row.push(1); // Solid ground
+      } else {
+        row.push(0); // Sky
+      }
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+
+const STAGES_DATA = [
+  // =========================================================================
+  // STAGE 1: NEON NIGHT MARKET & SEOUL STREET
+  // =========================================================================
+  {
+    id: 1,
+    name: "STAGE 1: NEON NIGHT MARKET",
+    stageType: "market",
+    musicTrack: "stage1",
+    widthTiles: 70,
+    heightTiles: 12,
+    tileSize: 32,
+    playerStart: { x: 64, y: 220 },
+    bossType: "dj_dokkaebi",
+    bossSpawn: { x: 1950, y: 180 },
+    arenaLockX: 1700,
+
+    buildTilemap: function() {
+      const cols = 70;
+      const rows = 12;
+      const map = createStageGrid(cols, rows, 10);
+
+      // Add floating ramen stall roofs & one-way platforms
+      // Section 1: Introduction hops
+      map[8][8] = 2; map[8][9] = 2; map[8][10] = 2;
+      map[7][15] = 2; map[7][16] = 2; map[7][17] = 2;
+
+      // Section 2: Ramen shop rooftop
+      map[6][24] = 1; map[6][25] = 1; map[6][26] = 1; map[6][27] = 1;
+      map[9][28] = 3; // Bouncy Ramen Spring!
+
+      // Section 3: High market neon bridges
+      map[5][34] = 2; map[5][35] = 2; map[5][36] = 2;
+      map[7][42] = 2; map[7][43] = 2; map[7][44] = 2;
+      map[9][47] = 3; // Spring pad
+
+      // Section 4: Pagoda tower before boss
+      map[7][54] = 1; map[7][55] = 1; map[7][56] = 1;
+      map[5][55] = 2; map[5][56] = 2;
+
+      // Boss Arena Floor (Flat, wide with 2 side speaker platforms)
+      map[7][60] = 2; map[7][61] = 2;
+      map[7][67] = 2; map[7][68] = 2;
+
+      return map;
+    },
+
+    spawns: {
+      enemies: [
+        { x: 350, y: 260, type: 'imp' },
+        { x: 580, y: 260, type: 'imp' },
+        { x: 800, y: 140, type: 'ghoul' },
+        { x: 1050, y: 260, type: 'dokkaebi' },
+        { x: 1250, y: 120, type: 'bat' },
+        { x: 1450, y: 260, type: 'imp' },
+        { x: 1600, y: 260, type: 'dokkaebi' }
+      ],
+      collectibles: [
+        // Steaming Ramen Bowls
+        { x: 300, y: 220, type: 'ramen_normal' },
+        { x: 520, y: 180, type: 'ramen_normal' },
+        { x: 830, y: 140, type: 'ramen_spicy' },
+        { x: 1150, y: 120, type: 'ramen_rainbow' },
+        { x: 1750, y: 180, type: 'ramen_normal' },
+        // Stars
+        { x: 260, y: 260, type: 'star' },
+        { x: 280, y: 260, type: 'star' },
+        { x: 490, y: 180, type: 'star' },
+        { x: 550, y: 180, type: 'star' },
+        { x: 920, y: 260, type: 'star' },
+        { x: 1400, y: 260, type: 'star' },
+        // Secret Golden Chopsticks
+        { x: 800, y: 90, type: 'chopsticks' },
+        // Rare Photocard
+        { x: 1420, y: 130, type: 'photocard' }
+      ]
+    }
+  },
+
+  // =========================================================================
+  // STAGE 2: HAUNTED K-POP CONCERT DOME
+  // =========================================================================
+  {
+    id: 2,
+    name: "STAGE 2: HAUNTED CONCERT DOME",
+    stageType: "concert",
+    musicTrack: "stage2",
+    widthTiles: 75,
+    heightTiles: 12,
+    tileSize: 32,
+    playerStart: { x: 64, y: 220 },
+    bossType: "dj_dokkaebi",
+    bossSpawn: { x: 2100, y: 180 },
+    arenaLockX: 1850,
+
+    buildTilemap: function() {
+      const cols = 75;
+      const rows = 12;
+      const map = createStageGrid(cols, rows, 10);
+
+      // Floating speaker stacks & laser catwalks
+      map[8][6] = 2; map[8][7] = 2; map[8][8] = 2;
+      map[6][12] = 2; map[6][13] = 2; map[6][14] = 2;
+      map[9][18] = 3; // Spring bounce into spotlight
+
+      map[5][22] = 1; map[5][23] = 1; map[5][24] = 1;
+      map[7][30] = 2; map[7][31] = 2; map[7][32] = 2;
+      map[6][38] = 2; map[6][39] = 2; map[6][40] = 2;
+
+      map[9][44] = 3; // Spring
+      map[5][48] = 1; map[5][49] = 1; map[5][50] = 1;
+      map[7][56] = 2; map[7][57] = 2; map[7][58] = 2;
+
+      // Boss Arena Truss Catwalks
+      map[7][64] = 2; map[7][65] = 2;
+      map[7][71] = 2; map[7][72] = 2;
+
+      return map;
+    },
+
+    spawns: {
+      enemies: [
+        { x: 300, y: 150, type: 'ghoul' },
+        { x: 450, y: 100, type: 'bat' },
+        { x: 650, y: 260, type: 'imp' },
+        { x: 800, y: 120, type: 'ghoul' },
+        { x: 1000, y: 260, type: 'dokkaebi' },
+        { x: 1200, y: 110, type: 'bat' },
+        { x: 1400, y: 130, type: 'ghoul' },
+        { x: 1650, y: 260, type: 'dokkaebi' }
+      ],
+      collectibles: [
+        { x: 220, y: 220, type: 'ramen_normal' },
+        { x: 420, y: 150, type: 'ramen_spicy' },
+        { x: 740, y: 110, type: 'ramen_rainbow' },
+        { x: 1100, y: 260, type: 'ramen_normal' },
+        { x: 1580, y: 180, type: 'ramen_spicy' },
+        // Stars
+        { x: 200, y: 260, type: 'star' },
+        { x: 400, y: 150, type: 'star' },
+        { x: 600, y: 260, type: 'star' },
+        { x: 900, y: 260, type: 'star' },
+        { x: 1350, y: 260, type: 'star' },
+        { x: 1550, y: 180, type: 'star' },
+        // Collectibles
+        { x: 750, y: 70, type: 'chopsticks' },
+        { x: 1580, y: 120, type: 'photocard' }
+      ]
+    }
+  },
+
+  // =========================================================================
+  // STAGE 3: MYSTIC NOODLE TEMPLE & CHERRY BLOSSOM SHRINE
+  // =========================================================================
+  {
+    id: 3,
+    name: "STAGE 3: MYSTIC NOODLE TEMPLE",
+    stageType: "temple",
+    musicTrack: "stage1",
+    widthTiles: 80,
+    heightTiles: 12,
+    tileSize: 32,
+    playerStart: { x: 64, y: 220 },
+    bossType: "ramen_fiend",
+    bossSpawn: { x: 2250, y: 160 },
+    arenaLockX: 2000,
+
+    buildTilemap: function() {
+      const cols = 80;
+      const rows = 12;
+      const map = createStageGrid(cols, rows, 10);
+
+      // Temple pagodas & bouncy giant ramen bowls
+      map[8][7] = 1; map[8][8] = 1; map[8][9] = 1;
+      map[6][14] = 2; map[6][15] = 2; map[6][16] = 2;
+      map[9][20] = 3; // Spring
+
+      map[5][25] = 1; map[5][26] = 1; map[5][27] = 1; map[5][28] = 1;
+      map[7][34] = 2; map[7][35] = 2; map[7][36] = 2;
+
+      map[6][42] = 1; map[6][43] = 1; map[6][44] = 1;
+      map[9][48] = 3; // Spring
+      map[4][52] = 2; map[4][53] = 2; map[4][54] = 2;
+
+      map[7][62] = 2; map[7][63] = 2; map[7][64] = 2;
+      map[9][68] = 3;
+
+      // Boss Arena Platforms
+      map[7][72] = 2; map[7][73] = 2;
+      map[7][77] = 2; map[7][78] = 2;
+
+      return map;
+    },
+
+    spawns: {
+      enemies: [
+        { x: 300, y: 260, type: 'dumpling' },
+        { x: 500, y: 260, type: 'imp' },
+        { x: 750, y: 120, type: 'ghoul' },
+        { x: 950, y: 260, type: 'dumpling' },
+        { x: 1200, y: 110, type: 'bat' },
+        { x: 1450, y: 260, type: 'dokkaebi' },
+        { x: 1750, y: 260, type: 'imp' }
+      ],
+      collectibles: [
+        { x: 260, y: 220, type: 'ramen_normal' },
+        { x: 480, y: 150, type: 'ramen_spicy' },
+        { x: 820, y: 100, type: 'ramen_rainbow' },
+        { x: 1350, y: 260, type: 'ramen_normal' },
+        { x: 1680, y: 180, type: 'ramen_spicy' },
+        // Stars
+        { x: 240, y: 260, type: 'star' },
+        { x: 450, y: 150, type: 'star' },
+        { x: 800, y: 100, type: 'star' },
+        { x: 1100, y: 260, type: 'star' },
+        { x: 1500, y: 260, type: 'star' },
+        // Collectibles
+        { x: 830, y: 60, type: 'chopsticks' },
+        { x: 1700, y: 120, type: 'photocard' }
+      ]
+    }
+  },
+
+  // =========================================================================
+  // STAGE 4: DEMON LORD'S NEON CASTLE FINALE
+  // =========================================================================
+  {
+    id: 4,
+    name: "STAGE 4: DEMON CASTLE FINALE",
+    stageType: "castle",
+    musicTrack: "boss",
+    widthTiles: 85,
+    heightTiles: 12,
+    tileSize: 32,
+    playerStart: { x: 64, y: 220 },
+    bossType: "gwi_ma",
+    bossSpawn: { x: 2400, y: 160 },
+    arenaLockX: 2150,
+
+    buildTilemap: function() {
+      const cols = 85;
+      const rows = 12;
+      const map = createStageGrid(cols, rows, 10);
+
+      // High castle battlements & floating cyber platforms
+      map[8][6] = 1; map[8][7] = 1;
+      map[6][12] = 2; map[6][13] = 2; map[6][14] = 2;
+      map[4][18] = 2; map[4][19] = 2; map[4][20] = 2;
+
+      map[9][26] = 3; // Spring
+      map[5][30] = 1; map[5][31] = 1; map[5][32] = 1;
+      map[7][38] = 2; map[7][39] = 2; map[7][40] = 2;
+
+      map[6][48] = 1; map[6][49] = 1; map[6][50] = 1;
+      map[9][56] = 3; // Spring
+      map[5][62] = 2; map[5][63] = 2; map[5][64] = 2;
+      map[7][70] = 2; map[7][71] = 2;
+
+      // Final Stage Climax Arena
+      map[7][76] = 2; map[7][77] = 2;
+      map[7][82] = 2; map[7][83] = 2;
+
+      return map;
+    },
+
+    spawns: {
+      enemies: [
+        { x: 300, y: 260, type: 'imp' },
+        { x: 450, y: 100, type: 'bat' },
+        { x: 650, y: 120, type: 'ghoul' },
+        { x: 900, y: 260, type: 'dokkaebi' },
+        { x: 1150, y: 100, type: 'bat' },
+        { x: 1400, y: 120, type: 'ghoul' },
+        { x: 1650, y: 260, type: 'dokkaebi' },
+        { x: 1900, y: 260, type: 'imp' }
+      ],
+      collectibles: [
+        { x: 220, y: 220, type: 'ramen_spicy' },
+        { x: 600, y: 100, type: 'ramen_rainbow' },
+        { x: 1000, y: 260, type: 'ramen_normal' },
+        { x: 1550, y: 180, type: 'ramen_rainbow' },
+        { x: 2000, y: 260, type: 'ramen_spicy' },
+        // Stars
+        { x: 200, y: 260, type: 'star' },
+        { x: 580, y: 100, type: 'star' },
+        { x: 950, y: 260, type: 'star' },
+        { x: 1350, y: 260, type: 'star' },
+        { x: 1800, y: 260, type: 'star' },
+        // Collectibles
+        { x: 620, y: 50, type: 'chopsticks' },
+        { x: 1950, y: 150, type: 'photocard' }
+      ]
+    }
+  }
+];
+
+window.STAGES_DATA = STAGES_DATA;
+ô.)˜·      jÅ/jÅ0I“∑ÀjÅ@   T    O^partitionKey=%28http%2Clocalhost%29,:http://localhost:8093/js/levels/level_data.js strongly-framed 1 request-method GET response-head HTTP/1.0 200 OK
+Server: SimpleHTTP/0.6 Python/3.14.6
+Date: Sun, 16 Aug 2026 01:45:20 GMT
+Content-type: text/javascript
+Content-Length: 10098
+Last-Modified: Sun, 16 Aug 2026 01:42:23 GMT
+ original-response-headers Server: SimpleHTTP/0.6 Python/3.14.6
+Date: Sun, 16 Aug 2026 01:45:20 GMT
+Content-type: text/javascript
+Content-Length: 10098
+Last-Modified: Sun, 16 Aug 2026 01:42:23 GMT
+ ctid 2 net-response-time-onstart 21 net-response-time-onstop 22      'r

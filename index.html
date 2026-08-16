@@ -102,6 +102,7 @@
           <button id="toggle-crt" class="tiny-btn" title="Toggle 8-Bit CRT Scanlines">CRT: ON</button>
           <button id="toggle-sound" class="tiny-btn" title="Toggle Sound">MUTE</button>
           <button id="toggle-assist" class="tiny-btn assist-indicator" title="Kid Assist Mode Settings">👶 ASSIST: ON</button>
+          <button id="toggle-test-agent-footer" class="tiny-btn qa-indicator" onclick="if(window.testAgentUI)window.testAgentUI.toggleModal()" title="Open Test Agent QA Dashboard">🤖 QA AGENT</button>
         </div>
       </footer>
     </div>
@@ -117,6 +118,7 @@
   <script src="js/engine/particles.js"></script>
   <script src="js/engine/physics.js"></script>
   <script src="js/engine/camera.js"></script>
+  <script src="js/engine/test_agent.js"></script>
   <script src="js/entities/collectible.js"></script>
   <script src="js/entities/enemy.js"></script>
   <script src="js/entities/boss.js"></script>
@@ -127,6 +129,7 @@
   <script src="js/ui/menus.js"></script>
   <script src="js/ui/album.js"></script>
   <script src="js/ui/ramen_game.js"></script>
+  <script src="js/ui/test_agent_ui.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
