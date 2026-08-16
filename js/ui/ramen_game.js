@@ -13,6 +13,8 @@ class RamenMinigame {
     this.speed = 4.5;
     this.ingredients = [];
     this.score = 0;
+    this.highScore = parseInt(localStorage.getItem('kpop_ramen_highscore') || '0', 10);
+    this.isNewRecord = false;
     this.timeLeft = 40;
     this.animTimer = 0;
     this.spawnTimer = 0;
@@ -23,6 +25,8 @@ class RamenMinigame {
     this.isActive = true;
     this.isGameOver = false;
     this.score = 0;
+    this.isNewRecord = false;
+    this.highScore = parseInt(localStorage.getItem('kpop_ramen_highscore') || '0', 10);
     this.timeLeft = 40;
     this.ingredients = [];
     this.spawnTimer = 0;
@@ -39,7 +43,12 @@ class RamenMinigame {
     if (this.timeLeft <= 0) {
       this.timeLeft = 0;
       this.isGameOver = true;
-      if (sfx) sfx.playRainbowFever();
+      if (this.score > this.highScore) {
+        this.highScore = this.score;
+        this.isNewRecord = true;
+        try { localStorage.setItem('kpop_ramen_highscore', String(this.score)); } catch (e) {}
+      }
+      if (sfx) { sfx.playRainbowFever(); sfx.playVocalDaebak(); }
       return;
     }
 
@@ -55,13 +64,13 @@ class RamenMinigame {
     // Spawn Ingredients
     this.spawnTimer -= dt;
     if (this.spawnTimer <= 0) {
-      this.spawnTimer = 0.4 + Math.random() * 0.4;
-      const types = ['noodle', 'egg', 'naruto', 'chili', 'star'];
+      this.spawnTimer = 0.35 + Math.random() * 0.35;
+      const types = ['noodle', 'egg', 'naruto', 'chili', 'star', 'golden_egg'];
       const chosenType = types[Math.floor(Math.random() * types.length)];
       this.ingredients.push({
         x: 20 + Math.random() * (viewportWidth - 40),
         y: 10,
-        vy: 1.8 + Math.random() * 1.5,
+        vy: 1.8 + Math.random() * 1.6,
         type: chosenType,
         size: 16
       });
@@ -88,9 +97,14 @@ class RamenMinigame {
         if (item.type === 'naruto') this.score += 35;
         if (item.type === 'star') this.score += 50;
         if (item.type === 'chili') this.score += 100;
+        if (item.type === 'golden_egg') {
+          this.score += 150;
+          this.timeLeft = Math.min(50, this.timeLeft + 4);
+          if (sfx) sfx.playRainbowFever();
+        }
 
         if (sfx) sfx.playSlurp();
-        if (particles) particles.spawnSparkleBurst(item.x, item.y, 8, '#ffe600');
+        if (particles) particles.spawnSparkleBurst(item.x, item.y, 10, item.type === 'golden_egg' ? '#ffd700' : '#ffe600');
 
         this.ingredients.splice(i, 1);
         continue;
@@ -121,7 +135,7 @@ class RamenMinigame {
       }
     }
 
-    // Top Bar (Score & Time)
+    // Top Bar (Score, High Score & Time)
     ctx.fillStyle = 'rgba(8, 2, 18, 0.9)';
     ctx.fillRect(0, 0, viewportWidth, 24);
     ctx.fillStyle = '#ff6b00';
@@ -130,6 +144,10 @@ class RamenMinigame {
     ctx.fillStyle = '#ffe600';
     ctx.font = "8px 'Press Start 2P', monospace";
     ctx.fillText(`🍜 SCORE: ${this.score}`, 10, 15);
+
+    ctx.fillStyle = '#00f0ff';
+    ctx.textAlign = 'center';
+    ctx.fillText(`BEST: ${Math.max(this.highScore, this.score)}`, viewportWidth / 2, 15);
 
     ctx.fillStyle = this.timeLeft <= 10 ? '#ff0055' : '#00f0ff';
     ctx.textAlign = 'right';
@@ -149,6 +167,13 @@ class RamenMinigame {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(-6, -6, 12, 12);
         ctx.fillStyle = '#ff9900';
+        ctx.fillRect(-3, -3, 6, 6);
+      } else if (item.type === 'golden_egg') {
+        ctx.fillStyle = '#ffd700';
+        ctx.shadowColor = '#ffe600';
+        ctx.shadowBlur = 10;
+        ctx.fillRect(-7, -7, 14, 14);
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(-3, -3, 6, 6);
       } else if (item.type === 'naruto') {
         ctx.fillStyle = '#ffffff';
@@ -171,24 +196,30 @@ class RamenMinigame {
 
     // Game Over Summary
     if (this.isGameOver) {
-      ctx.fillStyle = 'rgba(10, 2, 22, 0.92)';
-      ctx.fillRect(40, 45, viewportWidth - 80, 125);
+      ctx.fillStyle = 'rgba(10, 2, 22, 0.94)';
+      ctx.fillRect(35, 40, viewportWidth - 70, 135);
       ctx.strokeStyle = '#ffe600';
       ctx.lineWidth = 2;
-      ctx.strokeRect(40, 45, viewportWidth - 80, 125);
+      ctx.strokeRect(35, 40, viewportWidth - 70, 135);
 
       ctx.textAlign = 'center';
       ctx.fillStyle = '#ffe600';
       ctx.font = "12px 'Press Start 2P', monospace";
-      ctx.fillText("🍜 YUMMY BOWL COMPLETE! 🍜", viewportWidth / 2, 75);
+      ctx.fillText("🍜 YUMMY BOWL COMPLETE! 🍜", viewportWidth / 2, 68);
+
+      if (this.isNewRecord) {
+        ctx.fillStyle = '#39ff14';
+        ctx.font = "9px 'Press Start 2P', monospace";
+        ctx.fillText("🌟 NEW HIGH SCORE RECORD! 🌟", viewportWidth / 2, 92);
+      }
 
       ctx.fillStyle = '#00f0ff';
       ctx.font = "9px 'Press Start 2P', monospace";
-      ctx.fillText(`FINAL SCORE: ${this.score}`, viewportWidth / 2, 105);
+      ctx.fillText(`FINAL SCORE: ${this.score}`, viewportWidth / 2, 114);
 
       ctx.fillStyle = '#ffffff';
       ctx.font = "7px 'Press Start 2P', monospace";
-      ctx.fillText("★ TAP / PRESS ANY BUTTON TO EXIT ★", viewportWidth / 2, 140);
+      ctx.fillText("★ TAP / PRESS ANY BUTTON TO EXIT ★", viewportWidth / 2, 150);
       ctx.textAlign = 'left';
     }
 

@@ -84,6 +84,10 @@ const STAGES_DATA = [
         { x: 830, y: 140, type: 'ramen_spicy' },
         { x: 1150, y: 120, type: 'ramen_rainbow' },
         { x: 1750, y: 180, type: 'ramen_normal' },
+        // Slicable Hanging Neon Lanterns
+        { x: 420, y: 130, type: 'lantern' },
+        { x: 700, y: 120, type: 'lantern' },
+        { x: 1350, y: 140, type: 'lantern' },
         // Stars
         { x: 260, y: 260, type: 'star' },
         { x: 280, y: 260, type: 'star' },
@@ -157,6 +161,10 @@ const STAGES_DATA = [
         { x: 740, y: 110, type: 'ramen_rainbow' },
         { x: 1100, y: 260, type: 'ramen_normal' },
         { x: 1580, y: 180, type: 'ramen_spicy' },
+        // Slicable Concert Dome Lanterns
+        { x: 500, y: 90, type: 'lantern' },
+        { x: 920, y: 140, type: 'lantern' },
+        { x: 1450, y: 90, type: 'lantern' },
         // Stars
         { x: 200, y: 260, type: 'star' },
         { x: 400, y: 150, type: 'star' },
@@ -230,6 +238,10 @@ const STAGES_DATA = [
         { x: 820, y: 100, type: 'ramen_rainbow' },
         { x: 1350, y: 260, type: 'ramen_normal' },
         { x: 1680, y: 180, type: 'ramen_spicy' },
+        // Destructible Mystic Shrine Crystals
+        { x: 620, y: 140, type: 'demon_crystal' },
+        { x: 1080, y: 110, type: 'demon_crystal' },
+        { x: 1550, y: 150, type: 'demon_crystal' },
         // Stars
         { x: 240, y: 260, type: 'star' },
         { x: 450, y: 150, type: 'star' },
@@ -302,6 +314,10 @@ const STAGES_DATA = [
         { x: 1000, y: 260, type: 'ramen_normal' },
         { x: 1550, y: 180, type: 'ramen_rainbow' },
         { x: 2000, y: 260, type: 'ramen_spicy' },
+        // Destructible Troll King Obsidian Crystals
+        { x: 480, y: 90, type: 'demon_crystal' },
+        { x: 1200, y: 80, type: 'demon_crystal' },
+        { x: 1800, y: 140, type: 'demon_crystal' },
         // Stars
         { x: 200, y: 260, type: 'star' },
         { x: 580, y: 100, type: 'star' },

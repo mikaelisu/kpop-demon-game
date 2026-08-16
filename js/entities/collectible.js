@@ -39,6 +39,46 @@ class Collectible {
       spriteRenderer.drawStar(ctx, screenX + 4, screenY + 4, this.animTimer, 1.6);
     } else if (this.type === 'chopsticks') {
       spriteRenderer.drawGoldenChopsticks(ctx, screenX + 4, screenY + 2, this.animTimer, 1.4);
+    } else if (this.type === 'lantern') {
+      // Slicable Hanging Neon Lantern
+      ctx.save();
+      const sway = Math.sin(this.animTimer * 4) * 3;
+      ctx.translate(screenX + 12 + sway, screenY);
+      // Hanging wire
+      ctx.fillStyle = '#ffaa00';
+      ctx.fillRect(-1, 0, 2, 6);
+      // Glowing Lantern Body
+      ctx.fillStyle = '#ff3300';
+      ctx.shadowColor = '#ff6b00';
+      ctx.shadowBlur = 12;
+      ctx.fillRect(-8, 6, 16, 14);
+      ctx.fillStyle = '#ffd700';
+      ctx.fillRect(-5, 9, 10, 8);
+      // Tassel
+      ctx.fillStyle = '#ff007f';
+      ctx.fillRect(-2, 20, 4, 6);
+      ctx.restore();
+    } else if (this.type === 'demon_crystal') {
+      // Destructible Demon Shrine Crystal
+      ctx.save();
+      const glow = Math.abs(Math.sin(this.animTimer * 5)) * 6;
+      ctx.translate(screenX + 12, screenY + 12);
+      ctx.fillStyle = '#7209b7';
+      ctx.shadowColor = '#cc00ff';
+      ctx.shadowBlur = 10 + glow;
+      // Diamond Crystal Hexagon
+      ctx.beginPath();
+      ctx.moveTo(0, -14);
+      ctx.lineTo(10, -4);
+      ctx.lineTo(8, 12);
+      ctx.lineTo(-8, 12);
+      ctx.lineTo(-10, -4);
+      ctx.closePath();
+      ctx.fill();
+      // Inner Neon Facet
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(-3, -6, 6, 10);
+      ctx.restore();
     } else if (this.type === 'photocard') {
       // Glowing Idol Photocard
       ctx.save();
@@ -56,7 +96,7 @@ class Collectible {
     }
   }
 
-  onCollect(player, sfx, particles) {
+  onCollect(player, sfx, particles, collectiblesList) {
     if (this.collected) return;
     this.collected = true;
 
@@ -96,6 +136,25 @@ class Collectible {
       player.score += 800;
       if (sfx) sfx.playRainbowFever();
       if (particles) particles.spawnSparkleBurst(this.x + 12, this.y + 12, 20, '#ff007f');
+    } else if (this.type === 'lantern') {
+      player.score += 250;
+      player.addSlurpMeter(20);
+      if (sfx) { sfx.playLanternBurst(); sfx.playVocalHyeah(); }
+      if (particles) particles.spawnSparkleBurst(this.x + 12, this.y + 12, 20, '#ff6b00');
+      // Drop bonus stars or spicy ramen
+      if (collectiblesList) {
+        collectiblesList.push(new Collectible(this.x - 8, this.y + 6, 'star'));
+        collectiblesList.push(new Collectible(this.x + 14, this.y + 6, 'star'));
+      }
+    } else if (this.type === 'demon_crystal') {
+      player.score += 500;
+      player.addSlurpMeter(35);
+      if (sfx) { sfx.playCrystalShatter(); sfx.playVocalDaebak(); }
+      if (particles) particles.spawnSparkleBurst(this.x + 12, this.y + 12, 30, '#cc00ff');
+      // Drop rainbow ramen or golden chopsticks
+      if (collectiblesList) {
+        collectiblesList.push(new Collectible(this.x + 2, this.y + 4, 'ramen_rainbow'));
+      }
     }
   }
 }

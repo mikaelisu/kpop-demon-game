@@ -58,7 +58,7 @@ class Player {
     this.charId = charId;
   }
 
-  update(dt, input, physics, tilemap, sfx, particles, camera, playerProjectiles) {
+  update(dt, input, physics, tilemap, sfx, particles, camera, playerProjectiles, levelManager) {
     this.animTimer += dt;
 
     // Update Timers
@@ -118,7 +118,7 @@ class Player {
     // Check & Trigger Slurp Special Button (Always works!)
     if (this.slurpBufferTimer > 0 && this.state !== 'slurp') {
       if (this.slurpMeter >= 40) {
-        this.triggerSlurpSuper(sfx, particles, camera, playerProjectiles);
+        this.triggerSlurpSuper(sfx, particles, camera, playerProjectiles, levelManager);
       } else if (this.slurpCooldownTimer <= 0) {
         this.triggerMiniSlurp(sfx, particles, playerProjectiles);
       }
@@ -153,6 +153,7 @@ class Player {
         this.onGround = false;
         this.coyoteTimer = 0;
         this.jumpBufferTimer = 0;
+        this.canDoubleJump = this.charId === 'rumi';
         this.state = 'jump';
         if (sfx) sfx.playJump();
       } else if (this.state === 'wall_cling') {
@@ -160,11 +161,24 @@ class Player {
         this.vy = this.jumpForce * 0.95;
         this.vx = -this.wallClingDir * this.speed * 1.3;
         this.facingRight = this.wallClingDir < 0;
+        this.canDoubleJump = this.charId === 'rumi';
         this.state = 'jump';
         this.jumpBufferTimer = 0;
         if (sfx) sfx.playWallKick();
         if (particles) particles.spawnSparkleBurst(this.x + 12, this.y + 20, 8, '#00f0ff');
+      } else if (this.charId === 'rumi' && this.canDoubleJump && !this.onGround) {
+        // Rumi's Signature Moonlight Double Jump Flip!
+        this.vy = this.jumpForce * 0.9;
+        this.canDoubleJump = false;
+        this.jumpBufferTimer = 0;
+        this.state = 'jump';
+        if (sfx) sfx.playWallKick();
+        if (particles) particles.spawnSparkleBurst(this.x + 12, this.y + 20, 14, '#00f0ff');
       }
+    }
+
+    if (this.onGround) {
+      this.canDoubleJump = true;
     }
 
     // Execute Buffered Attack / Glowing Sword Slash
@@ -197,16 +211,33 @@ class Player {
 
   executeAttack(sfx, particles, playerProjectiles) {
     this.state = 'attack';
-    this.attackTimer = 0.18; // Fast, snappy 0.18s combo slash
+    // Zoey has fast attack speed (0.13s)
+    this.attackTimer = this.charId === 'zoey' ? 0.13 : 0.18;
 
     const swordColor = this.getSwordColor();
     if (sfx) sfx.playSlash(this.combo);
     if (particles) particles.spawnSlashTrail(this.x, this.y, swordColor, this.facingRight, this.combo);
 
-    // Spicy Mode Fire Wave Projectile
-    if (this.spicyTimer > 0 && playerProjectiles) {
-      const dir = this.facingRight ? 1 : -1;
-      playerProjectiles.push(new PlayerSlashWave(this.x + (this.facingRight ? 26 : -12), this.y + 4, dir * 5.5, '#ff3300'));
+    const dir = this.facingRight ? 1 : -1;
+
+    // Signature Character Finisher Moves on 3rd Combo Strike:
+    if (playerProjectiles) {
+      if (this.spicyTimer > 0) {
+        // Spicy Fire Wave
+        playerProjectiles.push(new PlayerSlashWave(this.x + (this.facingRight ? 26 : -12), this.y + 4, dir * 5.8, '#ff3300'));
+      } else if (this.combo === 3) {
+        if (this.charId === 'zoey') {
+          // Zoey: Twin Pink Star Homing Dagger Burst
+          playerProjectiles.push(new PlayerSlashWave(this.x + (this.facingRight ? 24 : -10), this.y, dir * 5.2, '#ff1493', -1.0));
+          playerProjectiles.push(new PlayerSlashWave(this.x + (this.facingRight ? 24 : -10), this.y + 8, dir * 5.2, '#ff1493', 1.0));
+        } else if (this.charId === 'mira') {
+          // Mira: Golden Flame Shockwave
+          playerProjectiles.push(new PlayerSlashWave(this.x + (this.facingRight ? 24 : -10), this.y + 6, dir * 4.8, '#ffaa00', 0));
+        } else if (this.charId === 'jinu') {
+          // Jinu: Violet Lightning Bolt Strike
+          playerProjectiles.push(new PlayerSlashWave(this.x + (this.facingRight ? 24 : -10), this.y - 12, dir * 5.0, '#cc00ff', 2.0));
+        }
+      }
     }
 
     // Cycle 3-hit K-Pop combo
@@ -214,7 +245,7 @@ class Player {
     this.comboResetTimer = 0.8;
   }
 
-  triggerSlurpSuper(sfx, particles, camera, playerProjectiles) {
+  triggerSlurpSuper(sfx, particles, camera, playerProjectiles, levelManager) {
     this.slurpMeter = 0;
     this.state = 'slurp';
     this.slurpAnimTimer = 0.45;
@@ -226,6 +257,11 @@ class Player {
     if (particles) {
       particles.spawnRamenSlurpFX(this.x + 14, this.y + 10);
       particles.spawnSparkleBurst(this.x + 14, this.y + 10, 30, '#ffe600');
+    }
+
+    // Trigger Companion Synergy (Cat 10-way Ring + Raven Supersonic Dive!)
+    if (levelManager && levelManager.companions) {
+      levelManager.companions.triggerSlurpSynergy(this, levelManager.enemies, levelManager.boss, levelManager.collectibles, sfx, particles);
     }
 
     // Spawn 360 Idol Sparkle Shockwave (8 glowing blade crescents)

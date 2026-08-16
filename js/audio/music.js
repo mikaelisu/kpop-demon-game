@@ -20,6 +20,22 @@ class MusicPlayer {
     this.stepIndex = 0;
     this.timerId = null;
     this.tempo = 135; // BPM
+    this.tempoMultiplier = 1.0;
+  }
+
+  setTempoMultiplier(mult = 1.0) {
+    if (Math.abs(this.tempoMultiplier - mult) < 0.01) return;
+    this.tempoMultiplier = mult;
+    if (this.isPlaying && this.currentTrack) {
+      // Re-schedule step timer with new tempo while preserving stepIndex
+      if (this.timerId) clearInterval(this.timerId);
+      const data = this.getTrackData(this.currentTrack);
+      const effectiveTempo = data.tempo * this.tempoMultiplier;
+      const stepDurationMs = (60000 / effectiveTempo) / 4;
+      this.timerId = setInterval(() => {
+        this.tickStep();
+      }, stepDurationMs);
+    }
   }
 
   // Define Music Patterns
@@ -184,7 +200,8 @@ class MusicPlayer {
     this.stepIndex = 0;
 
     const data = this.getTrackData(trackName);
-    const stepDurationMs = (60000 / data.tempo) / 4; // Sixteenth note step
+    const effectiveTempo = data.tempo * this.tempoMultiplier;
+    const stepDurationMs = (60000 / effectiveTempo) / 4; // Sixteenth note step
 
     this.timerId = setInterval(() => {
       this.tickStep();
@@ -198,7 +215,8 @@ class MusicPlayer {
     const totalSteps = data.p1.length;
     const idx = this.stepIndex % totalSteps;
 
-    const noteDuration = (60 / data.tempo) / 4 * 0.9;
+    const effectiveTempo = data.tempo * this.tempoMultiplier;
+    const noteDuration = (60 / effectiveTempo) / 4 * 0.9;
 
     // Pulse 1 Channel
     if (data.p1 && data.p1[idx]) {

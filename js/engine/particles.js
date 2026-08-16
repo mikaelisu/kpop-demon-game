@@ -46,6 +46,17 @@ class ParticleSystem {
       } else if (p.type === 'confetti') {
         // Rotating confetti square
         ctx.fillRect(screenX, screenY, p.size, p.size * 1.5);
+      } else if (p.type === 'ripple') {
+        // Expanding Neon Touch Ring
+        p.radius += 2.5;
+        p.alpha = Math.max(0, p.life / 0.4);
+        ctx.globalAlpha = p.alpha;
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, p.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
       } else if (p.type === 'slash_arc') {
         // Glowing slash wave
         ctx.strokeStyle = p.color;
@@ -60,6 +71,24 @@ class ParticleSystem {
 
       ctx.restore();
     }
+  }
+
+  /**
+   * Spawn Expanding Neon Touch Ripple
+   */
+  spawnTouchRipple(x, y, color = '#00f0ff') {
+    this.particles.push({
+      x,
+      y,
+      vx: 0,
+      vy: 0,
+      radius: 4,
+      size: 2,
+      color,
+      life: 0.35,
+      type: 'ripple',
+      glow: true
+    });
   }
 
   /**

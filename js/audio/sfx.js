@@ -95,6 +95,39 @@ class SoundEffects {
     this.synth.playTriangle(75, 0.5, 0.4, now);
     this.synth.playNoise(0.4, false, 0.3, now);
   }
+
+  playVocalHyeah() {
+    if (!this.synth || !this.synth.ctx) return;
+    const now = this.synth.ctx.currentTime;
+    // Cheerful upward 8-bit phonetic chirp
+    this.synth.playPulse(587.33, 0.06, 0.5, 0.22, 200, now);
+    this.synth.playPulse(880.00, 0.10, 0.5, 0.25, 400, now + 0.04);
+  }
+
+  playVocalDaebak() {
+    if (!this.synth || !this.synth.ctx) return;
+    const now = this.synth.ctx.currentTime;
+    // Triumphant double arpeggio chime
+    const notes = [659.25, 783.99, 1046.50, 1318.51];
+    notes.forEach((freq, i) => {
+      this.synth.playPulse(freq, 0.08, 0.5, 0.2, 0, now + i * 0.05);
+    });
+  }
+
+  playLanternBurst() {
+    if (!this.synth || !this.synth.ctx) return;
+    const now = this.synth.ctx.currentTime;
+    this.synth.playNoise(0.1, true, 0.2, now);
+    this.synth.playPulse(1200, 0.08, 0.5, 0.2, -400, now + 0.02);
+  }
+
+  playCrystalShatter() {
+    if (!this.synth || !this.synth.ctx) return;
+    const now = this.synth.ctx.currentTime;
+    this.synth.playNoise(0.18, true, 0.28, now);
+    this.synth.playPulse(1567.98, 0.1, 0.5, 0.22, -600, now);
+    this.synth.playPulse(2093.00, 0.14, 0.5, 0.25, -800, now + 0.04);
+  }
 }
 
 window.SoundEffects = SoundEffects;

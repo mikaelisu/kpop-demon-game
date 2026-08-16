@@ -206,12 +206,31 @@ class LevelManager {
       }
     }
 
-    // 5. Update Collectibles
+    // Dynamic Music Tempo Shift (Rainbow Fever 1.25x / Boss Pinch Mode 1.2x)
+    if (music) {
+      if (player.rainbowFeverTimer > 0) {
+        music.setTempoMultiplier(1.25);
+      } else if (this.boss && !this.boss.isDefeated && this.boss.hp <= this.boss.maxHp * 0.4) {
+        music.setTempoMultiplier(1.20);
+      } else {
+        music.setTempoMultiplier(1.0);
+      }
+    }
+
+    // 5. Update Collectibles & Destructible Props
+    const swordBox = player.getSwordHitbox();
     for (const c of this.collectibles) {
       if (c.collected) continue;
       c.update(dt);
+
+      // Player Touch Collect
       if (physics.checkOverlap(player.getHitbox(), c.getHitbox())) {
-        c.onCollect(player, sfx, particles);
+        c.onCollect(player, sfx, particles, this.collectibles);
+      }
+
+      // Sword Slash Destructibles (Lanterns, Crystals)
+      else if (swordBox && (c.type === 'lantern' || c.type === 'demon_crystal') && physics.checkOverlap(swordBox, c.getHitbox())) {
+        c.onCollect(player, sfx, particles, this.collectibles);
       }
     }
 

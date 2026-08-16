@@ -262,7 +262,8 @@ class GameApp {
         this.sfx,
         this.particles,
         this.camera,
-        this.levelManager.playerProjectiles
+        this.levelManager.playerProjectiles,
+        this.levelManager
       );
 
       // Update Camera follow
@@ -374,7 +375,16 @@ class GameApp {
   handleCanvasClick(e) {
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.virtualWidth / rect.width;
+    const scaleY = this.virtualHeight / rect.height;
     const clickX = (e.clientX - rect.x) * scaleX;
+    const clickY = (e.clientY - rect.y) * scaleY;
+
+    // Spawn Neon Touch Ripple
+    if (this.particles) {
+      const worldX = clickX + (this.state === 'playing' && this.camera ? this.camera.x : 0);
+      const worldY = clickY + (this.state === 'playing' && this.camera ? this.camera.y : 0);
+      this.particles.spawnTouchRipple(worldX, worldY, '#00f0ff');
+    }
 
     if (this.state === 'character_select') {
       if (clickX < this.virtualWidth * 0.3) {
@@ -412,7 +422,17 @@ class GameApp {
         this.menus.currentScreen = 'title';
       }
     } else if (this.state === 'playing') {
-      // Direct screen taps for toddlers: tap right side to jump/slash!
+      const scaleY = this.virtualHeight / rect.height;
+      const clickY = (e.clientY - rect.y) * scaleY;
+
+      // 1. Check if companion (Cat/Raven) was tapped directly
+      if (this.levelManager && this.levelManager.companions) {
+        if (this.levelManager.companions.handleTap(clickX, clickY, this.camera, this.sfx, this.particles)) {
+          return;
+        }
+      }
+
+      // 2. Direct screen taps for toddlers: tap right side to jump/slash!
       if (clickX > this.virtualWidth * 0.45) {
         if (clickX > this.virtualWidth * 0.72) {
           // Tap right -> Jump
