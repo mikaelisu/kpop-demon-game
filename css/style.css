@@ -341,19 +341,26 @@ html, body {
   flex-direction: row;
   gap: 4px;
   font-size: 9px;
-  background: rgba(255, 107, 0, 0.6);
-  border-color: var(--neon-yellow);
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.85) 0%, rgba(255, 20, 147, 0.85) 100%);
+  border: 2px solid var(--neon-yellow);
   color: #ffffff;
-  box-shadow: 0 0 12px rgba(255, 107, 0, 0.5);
+  box-shadow: 0 0 16px rgba(255, 107, 0, 0.7);
+  animation: slurp-btn-pulse 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes slurp-btn-pulse {
+  0% { box-shadow: 0 0 8px rgba(255, 107, 0, 0.5); transform: scale(1); }
+  100% { box-shadow: 0 0 20px var(--neon-yellow), 0 0 30px rgba(255, 0, 127, 0.6); transform: scale(1.04); }
 }
 
 .slurp-btn:active, .slurp-btn.active {
-  background: rgba(255, 107, 0, 0.95);
-  box-shadow: 0 0 24px var(--neon-yellow);
+  background: linear-gradient(135deg, #ffaa00 0%, #ff007f 100%);
+  box-shadow: 0 0 30px var(--neon-yellow);
+  transform: scale(0.96);
 }
 
 .slurp-btn .btn-icon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .pause-btn {
@@ -587,7 +594,7 @@ html, body {
   position: fixed;
   top: 14px;
   right: 18px;
-  z-index: 1000;
+  z-index: 50000;
   background: linear-gradient(135deg, #180033 0%, #3a0066 100%);
   border: 2px solid #39ff14;
   color: #39ff14;
@@ -617,9 +624,9 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(5, 1, 12, 0.82);
+  background: rgba(5, 1, 12, 0.88);
   backdrop-filter: blur(8px);
-  z-index: 9999;
+  z-index: 99999;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -21,7 +21,7 @@ class Player {
     // Health & Stats
     this.maxHp = 4;
     this.hp = this.maxHp;
-    this.slurpMeter = 30; // 0 - 100
+    this.slurpMeter = 100; // Starts 100% FULL so kid can immediately use SLURP!
     this.maxSlurpMeter = 100;
     this.score = 0;
     this.starsCollected = 0;
@@ -32,6 +32,8 @@ class Player {
     this.animTimer = 0;
     this.attackTimer = 0;
     this.attackBufferTimer = 0;
+    this.slurpBufferTimer = 0;
+    this.slurpCooldownTimer = 0;
     this.combo = 1;
     this.comboResetTimer = 0;
     this.invincibleTimer = 0;
@@ -61,6 +63,7 @@ class Player {
 
     // Update Timers
     if (this.invincibleTimer > 0) this.invincibleTimer -= dt;
+    if (this.slurpCooldownTimer > 0) this.slurpCooldownTimer -= dt;
     if (this.comboResetTimer > 0) {
       this.comboResetTimer -= dt;
       if (this.comboResetTimer <= 0) this.combo = 1;
@@ -88,6 +91,13 @@ class Player {
       this.attackBufferTimer -= dt;
     }
 
+    // Slurp Input Buffering
+    if (input.justSlurp() || input.isSlurp()) {
+      this.slurpBufferTimer = 0.25;
+    } else if (this.slurpBufferTimer > 0) {
+      this.slurpBufferTimer -= dt;
+    }
+
     // Slurp Super Animation
     if (this.state === 'slurp') {
       this.slurpAnimTimer -= dt;
@@ -105,10 +115,14 @@ class Player {
       return;
     }
 
-    // Check Slurp Special Button
-    if (input.justSlurp() && this.slurpMeter >= 50) {
-      this.triggerSlurpSuper(sfx, particles, camera, playerProjectiles);
-      return;
+    // Check & Trigger Slurp Special Button (Always works!)
+    if (this.slurpBufferTimer > 0 && this.state !== 'slurp') {
+      if (this.slurpMeter >= 40) {
+        this.triggerSlurpSuper(sfx, particles, camera, playerProjectiles);
+      } else if (this.slurpCooldownTimer <= 0) {
+        this.triggerMiniSlurp(sfx, particles, playerProjectiles);
+      }
+      this.slurpBufferTimer = 0;
     }
 
     // Horizontal Movement
@@ -203,7 +217,7 @@ class Player {
   triggerSlurpSuper(sfx, particles, camera, playerProjectiles) {
     this.slurpMeter = 0;
     this.state = 'slurp';
-    this.slurpAnimTimer = 0.5;
+    this.slurpAnimTimer = 0.45;
     this.heal(1);
     this.activateRainbowFever(8);
 
@@ -214,7 +228,7 @@ class Player {
       particles.spawnSparkleBurst(this.x + 14, this.y + 10, 30, '#ffe600');
     }
 
-    // Spawn 360 Idol Sparkle Shockwave
+    // Spawn 360 Idol Sparkle Shockwave (8 glowing blade crescents)
     if (playerProjectiles) {
       for (let i = 0; i < 8; i++) {
         const angle = (Math.PI * 2 / 8) * i;
@@ -226,6 +240,28 @@ class Player {
           Math.sin(angle) * 4.5
         ));
       }
+    }
+  }
+
+  triggerMiniSlurp(sfx, particles, playerProjectiles) {
+    this.slurpMeter = 0;
+    this.slurpCooldownTimer = 1.0;
+    this.state = 'slurp';
+    this.slurpAnimTimer = 0.3;
+    this.heal(1);
+
+    if (sfx) sfx.playSlurp();
+    if (particles) {
+      particles.spawnRamenSlurpFX(this.x + 14, this.y + 10);
+      particles.spawnSparkleBurst(this.x + 14, this.y + 10, 15, '#ffe600');
+    }
+
+    // Mini 3-star burst in forward direction
+    if (playerProjectiles) {
+      const dir = this.facingRight ? 1 : -1;
+      playerProjectiles.push(new PlayerSlashWave(this.x + 10, this.y + 10, dir * 4.0, '#ffe600', -1.2));
+      playerProjectiles.push(new PlayerSlashWave(this.x + 10, this.y + 10, dir * 4.5, '#ffe600', 0));
+      playerProjectiles.push(new PlayerSlashWave(this.x + 10, this.y + 10, dir * 4.0, '#ffe600', 1.2));
     }
   }
 

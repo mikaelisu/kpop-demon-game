@@ -374,44 +374,71 @@ class TestAgent {
       assert('Player System', 'Hana sword glow is Pink (#ff1493)', pHana.getSwordColor() === '#ff1493');
       assert('Player System', 'Felix sword glow is Violet (#cc00ff)', pFelix.getSwordColor() === '#cc00ff');
 
+      // Mock Sound & Particle Systems with complete callback signatures
+      const mockSFX = {
+        playSlash: () => {},
+        playJump: () => {},
+        playBounce: () => {},
+        playStar: () => {},
+        playSlurp: () => {},
+        playRainbowFever: () => {},
+        playEnemyHit: () => {},
+        playEnemyDefeat: () => {},
+        playPlayerHurt: () => {},
+        playBossRoar: () => {},
+        playChopsticks: () => {},
+        playWallKick: () => {}
+      };
+      const mockParticles = {
+        spawnSlashTrail: () => {},
+        spawnSparkleBurst: () => {},
+        spawnRamenSlurpFX: () => {},
+        spawnVictoryConfetti: () => {}
+      };
+
       // Combo System
-      const mockSFX = { playSlash: () => {}, playJump: () => {}, playBounce: () => {}, playStar: () => {}, playSlurp: () => {}, playRainbowFever: () => {} };
-      const mockParticles = { spawnSlashTrail: () => {}, spawnSparkleBurst: () => {}, spawnRamenSlurpFX: () => {} };
+      const pCombat = new Player('luna');
       const projList = [];
-      pLuna.executeAttack(mockSFX, mockParticles, projList);
-      assert('Combat System', 'Player attack sets attack state and timer', pLuna.state === 'attack' && pLuna.attackTimer > 0);
-      assert('Combat System', 'Player sword hitbox is active during attack', pLuna.getSwordHitbox() !== null);
-      assert('Combat System', 'Player combo increments to 2', pLuna.combo === 2);
+      pCombat.executeAttack(mockSFX, mockParticles, projList);
+      assert('Combat System', 'Player attack sets attack state and timer', pCombat.state === 'attack' && pCombat.attackTimer > 0);
+      assert('Combat System', 'Player sword hitbox is active during attack', pCombat.getSwordHitbox() !== null);
+      assert('Combat System', 'Player combo increments to 2', pCombat.combo === 2);
 
       // Spicy Fire Ramen Mode
-      pLuna.activateSpicyMode(10);
-      assert('Power-Ups', 'Spicy mode is active', pLuna.spicyTimer === 10);
-      assert('Power-Ups', 'Spicy mode changes sword color to #ff3300', pLuna.getSwordColor() === '#ff3300');
-      pLuna.executeAttack(mockSFX, mockParticles, projList);
-      assert('Power-Ups', 'Spicy attack spawns PlayerSlashWave projectile', projList.length > 0 && projList[0] instanceof PlayerSlashWave);
+      const pSpicy = new Player('luna');
+      pSpicy.activateSpicyMode(10);
+      assert('Power-Ups', 'Spicy mode is active', pSpicy.spicyTimer === 10);
+      assert('Power-Ups', 'Spicy mode changes sword color to #ff3300', pSpicy.getSwordColor() === '#ff3300');
+      const spicyProjList = [];
+      pSpicy.executeAttack(mockSFX, mockParticles, spicyProjList);
+      assert('Power-Ups', 'Spicy attack spawns PlayerSlashWave projectile', spicyProjList.length > 0 && spicyProjList[0] instanceof PlayerSlashWave);
 
       // Rainbow Golden Ramen Fever
-      pLuna.activateRainbowFever(12);
-      assert('Power-Ups', 'Rainbow Fever activates invincibility', pLuna.rainbowFeverTimer === 12 && pLuna.invincibleTimer === 12);
-      assert('Power-Ups', 'Rainbow Fever changes sword color to #ffe600', pLuna.getSwordColor() === '#ffe600');
+      const pRainbow = new Player('luna');
+      pRainbow.activateRainbowFever(12);
+      assert('Power-Ups', 'Rainbow Fever activates invincibility', pRainbow.rainbowFeverTimer === 12 && pRainbow.invincibleTimer === 12);
+      assert('Power-Ups', 'Rainbow Fever changes sword color to #ffe600', pRainbow.getSwordColor() === '#ffe600');
 
       // Slurp Super Strike
-      pLuna.slurpMeter = 50;
+      const pSlurp = new Player('luna');
+      pSlurp.slurpMeter = 50;
       const superProjList = [];
-      pLuna.triggerSlurpSuper(mockSFX, mockParticles, { shake: () => {} }, superProjList);
+      pSlurp.triggerSlurpSuper(mockSFX, mockParticles, { shake: () => {} }, superProjList);
       assert('Combat System', 'Slurp Super triggers 360 shockwave (8 projectiles)', superProjList.length === 8);
-      assert('Combat System', 'Slurp Super consumes slurp meter to 0', pLuna.slurpMeter === 0);
+      assert('Combat System', 'Slurp Super consumes slurp meter to 0', pSlurp.slurpMeter === 0);
 
       // Assist Mode Damage vs Normal Mode Damage
-      pLuna.assistInvincible = true;
-      pLuna.invincibleTimer = 0;
-      pLuna.takeDamage(1, mockSFX, mockParticles);
-      assert('Assist Mode', 'Playful invincibility prevents HP loss', pLuna.hp === pLuna.maxHp);
+      const pAssist = new Player('luna');
+      pAssist.assistInvincible = true;
+      pAssist.invincibleTimer = 0;
+      pAssist.takeDamage(1, mockSFX, mockParticles);
+      assert('Assist Mode', 'Playful invincibility prevents HP loss', pAssist.hp === pAssist.maxHp);
 
-      pLuna.assistInvincible = false;
-      pLuna.invincibleTimer = 0;
-      pLuna.takeDamage(1, mockSFX, mockParticles);
-      assert('Standard Mode', 'Non-assist mode deducts HP properly', pLuna.hp === pLuna.maxHp - 1);
+      const pNormal = new Player('luna');
+      pNormal.assistInvincible = false;
+      pNormal.invincibleTimer = 0;
+      pNormal.takeDamage(1, mockSFX, mockParticles);
+      assert('Standard Mode', 'Non-assist mode deducts HP properly', pNormal.hp === pNormal.maxHp - 1);
 
       // -----------------------------------------------------------------------
       // SUITE 3: Enemies & Boss Battles
@@ -444,7 +471,7 @@ class TestAgent {
 
       // Boss Attack Telegraph
       bossDJ.attackTimer = 0;
-      bossDJ.update(0.01, pLuna, [], mockParticles, mockSFX, { shake: () => {} });
+      bossDJ.update(0.01, pNormal, [], mockParticles, mockSFX, { shake: () => {} });
       assert('Boss System', 'Boss transitions to telegraph state for kids', bossDJ.state === 'telegraph' && bossDJ.telegraphTimer > 0);
 
       // -----------------------------------------------------------------------

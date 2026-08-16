@@ -347,7 +347,13 @@ class TestAgentUI {
   toggleModal() {
     this.isOpen = !this.isOpen;
     if (this.modalEl) {
-      this.modalEl.classList.toggle('hidden', !this.isOpen);
+      if (this.isOpen) {
+        this.modalEl.classList.remove('hidden');
+        this.modalEl.style.display = 'flex';
+      } else {
+        this.modalEl.classList.add('hidden');
+        this.modalEl.style.display = 'none';
+      }
     }
   }
 
