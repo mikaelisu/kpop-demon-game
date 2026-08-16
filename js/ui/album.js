@@ -136,3 +136,6 @@ class PhotocardAlbum {
 }
 
 window.PhotocardAlbum = PhotocardAlbum;
+window.Album = PhotocardAlbum;
+
+

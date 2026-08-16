@@ -26,7 +26,7 @@ class GameApp {
     this.levelManager = new LevelManager();
     this.hud = new HUD();
     this.menus = new MenuManager();
-    this.album = new Album();
+    this.album = new PhotocardAlbum();
     this.ramenGame = new RamenMinigame();
     this.chopstickFeast = new ChopstickFeastGame();
 
@@ -47,28 +47,45 @@ class GameApp {
   }
 
   initDOM() {
-    // 1. Audio Start Prompt
+    // 1. Audio Start Prompt & Direct Game Launch
     const prompt = document.getElementById('audio-start-prompt');
     const startBtn = document.getElementById('btn-start-audio');
 
     const handleStartAudio = (e) => {
-      if (e) e.preventDefault();
-      if (!this.isAudioStarted) {
-        this.synth.init();
-        this.synth.resume();
-        this.isAudioStarted = true;
-        this.music.playTrack('title');
-        if (prompt) prompt.style.display = 'none';
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      try {
+        if (!this.isAudioStarted) {
+          this.synth.init();
+          this.synth.resume();
+          this.isAudioStarted = true;
+        }
+        if (this.music) this.music.playTrack('title');
+        if (this.sfx) this.sfx.playStar();
+      } catch (err) {
+        console.warn('Audio start error:', err);
+      }
+
+      if (prompt) prompt.style.display = 'none';
+
+      // Advance directly from title screen into character selection!
+      if (this.state === 'title') {
+        this.state = 'character_select';
+        this.menus.currentScreen = 'character_select';
       }
     };
 
     if (startBtn) {
       startBtn.addEventListener('click', handleStartAudio);
+      startBtn.addEventListener('pointerdown', handleStartAudio);
       startBtn.addEventListener('touchstart', handleStartAudio, { passive: false });
     }
 
     if (prompt) {
       prompt.addEventListener('click', handleStartAudio);
+      prompt.addEventListener('pointerdown', handleStartAudio);
       prompt.addEventListener('touchstart', handleStartAudio, { passive: false });
     }
 
