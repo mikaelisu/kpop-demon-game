@@ -62,13 +62,18 @@ class HUD {
     spriteRenderer.drawRamenBowl(ctx, slurpX - 16, slurpY - 4, player.spicyTimer > 0 ? 'spicy' : (player.rainbowFeverTimer > 0 ? 'rainbow' : 'normal'), this.animTimer, 0.9);
 
     // 4. Stars & Golden Chopsticks Count
-    spriteRenderer.drawStar(ctx, 165, 4, this.animTimer, 1.2);
+    spriteRenderer.drawStar(ctx, 160, 4, this.animTimer, 1.2);
     ctx.fillStyle = '#ffffff';
     ctx.font = "8px 'Press Start 2P', monospace";
-    ctx.fillText(`x${player.starsCollected}`, 180, 15);
+    ctx.fillText(`x${player.starsCollected}`, 174, 15);
+
+    // Companion Assist Active Icons
+    ctx.font = "9px 'Press Start 2P', monospace";
+    ctx.fillText("🐾", 204, 15);
+    ctx.fillText("🦅", 220, 15);
 
     if (player.hasGoldenChopsticks) {
-      spriteRenderer.drawGoldenChopsticks(ctx, 215, 2, this.animTimer, 1.0);
+      spriteRenderer.drawGoldenChopsticks(ctx, 240, 2, this.animTimer, 1.0);
     }
 
     // 5. Score
@@ -93,7 +98,12 @@ class HUD {
       // Boss Name
       ctx.fillStyle = '#ffe600';
       ctx.font = "7px 'Press Start 2P', monospace";
-      const bName = (boss.type === 'gwi_ma' || boss.type === 'shadow_king') ? 'GWI-MA (DEMON KING)' : (boss.type === 'ramen_fiend' ? 'GIANT RAMEN FIEND' : 'DJ DOKKAEBI');
+      let bName = "CHIEF DOKKAEBI TROLL";
+      if (boss.type === 'troll_chef' || boss.type === 'ramen_fiend') {
+        bName = "GLUTTONOUS RAMEN TROLL";
+      } else if (boss.type === 'troll_king' || boss.type === 'gwi_ma' || boss.type === 'shadow_king') {
+        bName = "EMPEROR GWI-MA (TROLL KING)";
+      }
       ctx.fillText(bName, bX + 4, bY - 3);
 
       // HP Fill

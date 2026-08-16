@@ -19,6 +19,18 @@ class InputManager {
     };
     this.prevTouchState = { ...this.touchState };
 
+    this.gamepadState = {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      jump: false,
+      attack: false,
+      slurp: false,
+      pause: false
+    };
+    this.prevGamepadState = { ...this.gamepadState };
+
     this.injectedState = {
       left: false,
       right: false,
@@ -110,125 +122,163 @@ class InputManager {
   }
 
   /**
-   * Poll Gamepad API
+   * Poll Gamepad API with full PS4 DualShock 4 support and deadzone filtering
    */
   pollGamepad() {
-    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
-    if (!gamepads || !gamepads[0]) return;
+    // Reset gamepad state fresh on every frame
+    this.gamepadState = {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      jump: false,
+      attack: false,
+      slurp: false,
+      pause: false
+    };
 
-    const gp = gamepads[0];
-    // D-Pad / Left Stick
-    const stickX = gp.axes[0] || 0;
-    const stickY = gp.axes[1] || 0;
+    if (!navigator.getGamepads) return;
+    const gamepads = navigator.getGamepads();
+    if (!gamepads) return;
 
-    const padLeft = (gp.buttons[14] && gp.buttons[14].pressed) || stickX < -0.35;
-    const padRight = (gp.buttons[15] && gp.buttons[15].pressed) || stickX > 0.35;
-    const padUp = (gp.buttons[12] && gp.buttons[12].pressed) || stickY < -0.35;
-    const padDown = (gp.buttons[13] && gp.buttons[13].pressed) || stickY > 0.35;
+    for (let i = 0; i < gamepads.length; i++) {
+      const gp = gamepads[i];
+      if (!gp || !gp.connected) continue;
 
-    // Face Buttons
-    const btnJump = (gp.buttons[0] && gp.buttons[0].pressed); // A / Cross
-    const btnAttack = (gp.buttons[2] && gp.buttons[2].pressed) || (gp.buttons[1] && gp.buttons[1].pressed); // X / Square / B
-    const btnSlurp = (gp.buttons[3] && gp.buttons[3].pressed) || (gp.buttons[5] && gp.buttons[5].pressed); // Y / R1
-    const btnPause = (gp.buttons[9] && gp.buttons[9].pressed); // Start / Options
+      // Analog stick deadzone filtering (prevents stick drift from sticking)
+      const stickX = (gp.axes && gp.axes.length > 0) ? gp.axes[0] : 0;
+      const stickY = (gp.axes && gp.axes.length > 1) ? gp.axes[1] : 0;
+      const deadzone = 0.25;
 
-    if (padLeft) this.touchState.left = true;
-    if (padRight) this.touchState.right = true;
-    if (padUp) this.touchState.up = true;
-    if (padDown) this.touchState.down = true;
-    if (btnJump) this.touchState.jump = true;
-    if (btnAttack) this.touchState.attack = true;
-    if (btnSlurp) this.touchState.slurp = true;
-    if (btnPause) this.touchState.pause = true;
+      // D-Pad buttons (PS4 Standard) or Left Analog Stick
+      const padLeft = (gp.buttons[14] && gp.buttons[14].pressed) || stickX < -deadzone;
+      const padRight = (gp.buttons[15] && gp.buttons[15].pressed) || stickX > deadzone;
+      const padUp = (gp.buttons[12] && gp.buttons[12].pressed) || stickY < -deadzone;
+      const padDown = (gp.buttons[13] && gp.buttons[13].pressed) || stickY > deadzone;
+
+      // PS4 / DualShock 4 Buttons:
+      // buttons[0] = Cross (✕) -> Jump
+      // buttons[1] = Circle (◯) -> Special / Slurp
+      // buttons[2] = Square (▢) -> Attack
+      // buttons[3] = Triangle (▲) -> Super Slurp
+      // buttons[4] = L1 -> Super Slurp
+      // buttons[5] = R1 -> Attack
+      // buttons[6] = L2 -> Super Slurp
+      // buttons[7] = R2 -> Attack
+      // buttons[8] = Share -> Pause
+      // buttons[9] = Options -> Pause
+      // buttons[16] = PS Button -> Pause
+      const btnJump = (gp.buttons[0] && gp.buttons[0].pressed);
+      const btnAttack = (gp.buttons[2] && gp.buttons[2].pressed) || 
+                        (gp.buttons[5] && gp.buttons[5].pressed) || 
+                        (gp.buttons[7] && gp.buttons[7].pressed);
+      const btnSlurp = (gp.buttons[3] && gp.buttons[3].pressed) || 
+                       (gp.buttons[1] && gp.buttons[1].pressed) || 
+                       (gp.buttons[4] && gp.buttons[4].pressed) || 
+                       (gp.buttons[6] && gp.buttons[6].pressed);
+      const btnPause = (gp.buttons[9] && gp.buttons[9].pressed) || 
+                       (gp.buttons[8] && gp.buttons[8].pressed) || 
+                       (gp.buttons[16] && gp.buttons[16].pressed);
+
+      if (padLeft) this.gamepadState.left = true;
+      if (padRight) this.gamepadState.right = true;
+      if (padUp) this.gamepadState.up = true;
+      if (padDown) this.gamepadState.down = true;
+      if (btnJump) this.gamepadState.jump = true;
+      if (btnAttack) this.gamepadState.attack = true;
+      if (btnSlurp) this.gamepadState.slurp = true;
+      if (btnPause) this.gamepadState.pause = true;
+    }
   }
 
   update() {
     this.prevKeys = { ...this.keys };
     this.prevTouchState = { ...this.touchState };
+    this.prevGamepadState = { ...this.gamepadState };
     this.prevInjectedState = { ...this.injectedState };
     this.pollGamepad();
   }
 
   // Direction checks
   isLeft() {
-    return !!(this.keys['ArrowLeft'] || this.keys['KeyA'] || this.touchState.left || this.injectedState.left);
+    return !!(this.keys['ArrowLeft'] || this.keys['KeyA'] || this.touchState.left || this.gamepadState.left || this.injectedState.left);
   }
 
   isRight() {
-    return !!(this.keys['ArrowRight'] || this.keys['KeyD'] || this.touchState.right || this.injectedState.right);
+    return !!(this.keys['ArrowRight'] || this.keys['KeyD'] || this.touchState.right || this.gamepadState.right || this.injectedState.right);
   }
 
   isUp() {
-    return !!(this.keys['ArrowUp'] || this.keys['KeyW'] || this.touchState.up || this.injectedState.up);
+    return !!(this.keys['ArrowUp'] || this.keys['KeyW'] || this.touchState.up || this.gamepadState.up || this.injectedState.up);
   }
 
   isDown() {
-    return !!(this.keys['ArrowDown'] || this.keys['KeyS'] || this.touchState.down || this.injectedState.down);
+    return !!(this.keys['ArrowDown'] || this.keys['KeyS'] || this.touchState.down || this.gamepadState.down || this.injectedState.down);
   }
 
   // Action checks (held)
   isJump() {
-    return !!(this.keys['KeyX'] || this.keys['KeyK'] || this.keys['Space'] || this.touchState.jump || this.injectedState.jump);
+    return !!(this.keys['KeyX'] || this.keys['KeyK'] || this.keys['Space'] || this.touchState.jump || this.gamepadState.jump || this.injectedState.jump);
   }
 
   isAttack() {
-    return !!(this.keys['KeyZ'] || this.keys['KeyJ'] || this.touchState.attack || this.injectedState.attack);
+    return !!(this.keys['KeyZ'] || this.keys['KeyJ'] || this.touchState.attack || this.gamepadState.attack || this.injectedState.attack);
   }
 
   isSlurp() {
-    return !!(this.keys['KeyC'] || this.keys['KeyL'] || this.touchState.slurp || this.injectedState.slurp);
+    return !!(this.keys['KeyC'] || this.keys['KeyL'] || this.touchState.slurp || this.gamepadState.slurp || this.injectedState.slurp);
   }
 
   isPause() {
-    return !!(this.keys['KeyP'] || this.keys['Escape'] || this.touchState.pause || this.injectedState.pause);
+    return !!(this.keys['KeyP'] || this.keys['Escape'] || this.touchState.pause || this.gamepadState.pause || this.injectedState.pause);
   }
 
   // Action checks (just pressed this frame)
   justLeft() {
     const now = this.isLeft();
-    const prev = !!(this.prevKeys['ArrowLeft'] || this.prevKeys['KeyA'] || this.prevTouchState.left || this.prevInjectedState.left);
+    const prev = !!(this.prevKeys['ArrowLeft'] || this.prevKeys['KeyA'] || this.prevTouchState.left || this.prevGamepadState.left || this.prevInjectedState.left);
     return now && !prev;
   }
 
   justRight() {
     const now = this.isRight();
-    const prev = !!(this.prevKeys['ArrowRight'] || this.prevKeys['KeyD'] || this.prevTouchState.right || this.prevInjectedState.right);
+    const prev = !!(this.prevKeys['ArrowRight'] || this.prevKeys['KeyD'] || this.prevTouchState.right || this.prevGamepadState.right || this.prevInjectedState.right);
     return now && !prev;
   }
 
   justUp() {
     const now = this.isUp();
-    const prev = !!(this.prevKeys['ArrowUp'] || this.prevKeys['KeyW'] || this.prevTouchState.up || this.prevInjectedState.up);
+    const prev = !!(this.prevKeys['ArrowUp'] || this.prevKeys['KeyW'] || this.prevTouchState.up || this.prevGamepadState.up || this.prevInjectedState.up);
     return now && !prev;
   }
 
   justDown() {
     const now = this.isDown();
-    const prev = !!(this.prevKeys['ArrowDown'] || this.prevKeys['KeyS'] || this.prevTouchState.down || this.prevInjectedState.down);
+    const prev = !!(this.prevKeys['ArrowDown'] || this.prevKeys['KeyS'] || this.prevTouchState.down || this.prevGamepadState.down || this.prevInjectedState.down);
     return now && !prev;
   }
 
   justJump() {
     const now = this.isJump();
-    const prev = !!(this.prevKeys['KeyX'] || this.prevKeys['KeyK'] || this.prevKeys['Space'] || this.prevTouchState.jump || this.prevInjectedState.jump);
+    const prev = !!(this.prevKeys['KeyX'] || this.prevKeys['KeyK'] || this.prevKeys['Space'] || this.prevTouchState.jump || this.prevGamepadState.jump || this.prevInjectedState.jump);
     return now && !prev;
   }
 
   justAttack() {
     const now = this.isAttack();
-    const prev = !!(this.prevKeys['KeyZ'] || this.prevKeys['KeyJ'] || this.prevTouchState.attack || this.prevInjectedState.attack);
+    const prev = !!(this.prevKeys['KeyZ'] || this.prevKeys['KeyJ'] || this.prevTouchState.attack || this.prevGamepadState.attack || this.prevInjectedState.attack);
     return now && !prev;
   }
 
   justSlurp() {
     const now = this.isSlurp();
-    const prev = !!(this.prevKeys['KeyC'] || this.prevKeys['KeyL'] || this.prevTouchState.slurp || this.prevInjectedState.slurp);
+    const prev = !!(this.prevKeys['KeyC'] || this.prevKeys['KeyL'] || this.prevTouchState.slurp || this.prevGamepadState.slurp || this.prevInjectedState.slurp);
     return now && !prev;
   }
 
   justPause() {
     const now = this.isPause();
-    const prev = !!(this.prevKeys['KeyP'] || this.prevKeys['Escape'] || this.prevTouchState.pause || this.prevInjectedState.pause);
+    const prev = !!(this.prevKeys['KeyP'] || this.prevKeys['Escape'] || this.prevTouchState.pause || this.prevGamepadState.pause || this.prevInjectedState.pause);
     return now && !prev;
   }
 

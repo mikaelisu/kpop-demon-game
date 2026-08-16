@@ -108,6 +108,23 @@ class MenuManager {
       }, 1.2);
     });
 
+    // Demon Cat & Demon Raven Companions on Title Screen
+    spriteRenderer.drawDemonCat(ctx, {
+      x: width / 2 - 118,
+      y: 110 + Math.sin(this.animTimer * 4) * 4,
+      facingRight: true,
+      animTimer: this.animTimer,
+      isAttacking: false
+    }, 1.3);
+
+    spriteRenderer.drawDemonRaven(ctx, {
+      x: width / 2 + 102,
+      y: 96 + Math.cos(this.animTimer * 4) * 5,
+      facingRight: false,
+      animTimer: this.animTimer,
+      isDiving: false
+    }, 1.3);
+
     // Tap to Play Prompt
     const pulse = Math.floor(this.animTimer * 4) % 2 === 0;
     if (pulse) {
@@ -240,7 +257,10 @@ class MenuManager {
 
     ctx.fillStyle = '#ffffff';
     ctx.font = "7px 'Press Start 2P', monospace";
-    ctx.fillText(`BOSS: ${stage.bossType.toUpperCase().replace('_', ' ')}`, width / 2, boxY + 95);
+    let bLabel = "CHIEF DOKKAEBI TROLL";
+    if (stage.id === 3) bLabel = "GLUTTONOUS RAMEN TROLL";
+    if (stage.id === 4) bLabel = "EMPEROR GWI-MA (TROLL KING)";
+    ctx.fillText(`BOSS: ${bLabel}`, width / 2, boxY + 95);
 
     ctx.fillStyle = '#00f0ff';
     ctx.font = "8px 'Press Start 2P', monospace";
@@ -354,7 +374,7 @@ class MenuManager {
 
     ctx.fillStyle = '#00f0ff';
     ctx.font = "8px 'Press Start 2P', monospace";
-    ctx.fillText("ALL DEMONS PURIFIED WITH K-POP & RAMEN!", width / 2, 55);
+    ctx.fillText("ALL DEMON TROLLS PURIFIED WITH K-POP & RAMEN!", width / 2, 55);
 
     // All 4 Idols Dancing on Stage
     const idols = ['rumi', 'mira', 'zoey', 'jinu'];
@@ -373,6 +393,23 @@ class MenuManager {
         invincibleTimer: 0
       }, 1.5);
     });
+
+    // Demon Cat & Raven Dancing
+    spriteRenderer.drawDemonCat(ctx, {
+      x: width / 2 - 120,
+      y: 90 + Math.sin(this.animTimer * 6) * 6,
+      facingRight: true,
+      animTimer: this.animTimer,
+      isAttacking: false
+    }, 1.6);
+
+    spriteRenderer.drawDemonRaven(ctx, {
+      x: width / 2 + 104,
+      y: 75 + Math.cos(this.animTimer * 6) * 6,
+      facingRight: false,
+      animTimer: this.animTimer,
+      isDiving: false
+    }, 1.6);
 
     ctx.fillStyle = '#ff007f';
     ctx.font = "9px 'Press Start 2P', monospace";

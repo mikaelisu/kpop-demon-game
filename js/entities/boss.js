@@ -9,10 +9,10 @@ class Boss {
     this.y = y;
     this.startX = x;
     this.startY = y;
-    this.type = type; // 'dj_dokkaebi', 'ramen_fiend', 'gwi_ma', 'shadow_king'
-    this.width = 60;
-    this.height = 60;
-    this.maxHp = (type === 'gwi_ma' || type === 'shadow_king') ? 12 : (type === 'ramen_fiend' ? 10 : 8);
+    this.type = type; // 'troll_dj', 'troll_chef', 'troll_king', 'gwi_ma', 'dj_dokkaebi', 'ramen_fiend'
+    this.width = 64;
+    this.height = 64;
+    this.maxHp = (type === 'troll_king' || type === 'gwi_ma' || type === 'shadow_king') ? 12 : ((type === 'troll_chef' || type === 'ramen_fiend') ? 10 : 8);
     this.hp = this.maxHp;
     this.facingRight = false;
     this.animTimer = 0;
@@ -80,22 +80,22 @@ class Boss {
   executeAttack(player, projectiles, particles, sfx, camera) {
     if (!projectiles) return;
 
-    if (this.type === 'dj_dokkaebi') {
-      // Attack 1: Triple Music Note Beat Drop
-      if (sfx) sfx.playBossRoar();
-      if (camera) camera.shake(0.3, 5);
-
-      const dir = player.x > this.x ? 1 : -1;
-      projectiles.push(new EnemyProjectile(this.x + 20, this.y + 20, dir * 2.5, -1.0, 'note', '#00f0ff'));
-      projectiles.push(new EnemyProjectile(this.x + 20, this.y + 20, dir * 2.8, 0, 'note', '#ff007f'));
-      projectiles.push(new EnemyProjectile(this.x + 20, this.y + 20, dir * 2.5, 1.0, 'note', '#ffe600'));
-
-    } else if (this.type === 'ramen_fiend') {
-      // Attack 2: Naruto Fishcake Shuriken Starburst
+    if (this.type === 'dj_dokkaebi' || this.type === 'troll_dj') {
+      // Attack 1: Spiked Boombox Club Shockwave & Beat Drop
       if (sfx) sfx.playBossRoar();
       if (camera) camera.shake(0.4, 6);
 
-      const angles = [-0.4, -0.2, 0, 0.2, 0.4];
+      const dir = player.x > this.x ? 1 : -1;
+      projectiles.push(new EnemyProjectile(this.x + 20, this.y + 20, dir * 2.6, -1.2, 'note', '#00f0ff'));
+      projectiles.push(new EnemyProjectile(this.x + 20, this.y + 20, dir * 3.0, 0, 'note', '#ff007f'));
+      projectiles.push(new EnemyProjectile(this.x + 20, this.y + 20, dir * 2.6, 1.2, 'note', '#ffe600'));
+
+    } else if (this.type === 'ramen_fiend' || this.type === 'troll_chef') {
+      // Attack 2: Boiling Chili Rock & Spiked Chopstick Burst
+      if (sfx) sfx.playBossRoar();
+      if (camera) camera.shake(0.45, 7);
+
+      const angles = [-0.45, -0.22, 0, 0.22, 0.45];
       const baseAngle = Math.atan2(player.y - this.y, player.x - this.x);
 
       angles.forEach(offset => {
@@ -103,24 +103,24 @@ class Boss {
         projectiles.push(new EnemyProjectile(
           this.x + 30,
           this.y + 30,
-          Math.cos(a) * 2.8,
-          Math.sin(a) * 2.8,
+          Math.cos(a) * 3.0,
+          Math.sin(a) * 3.0,
           'fishcake',
-          '#ffffff'
+          '#ff3300'
         ));
       });
 
     } else {
-      // Attack 3: Shadow King Laser Lightshow
+      // Attack 3: Emperor Troll Dark Lightning Lightshow
       if (sfx) sfx.playBossRoar();
-      if (camera) camera.shake(0.5, 7);
+      if (camera) camera.shake(0.55, 8);
 
       for (let i = -2; i <= 2; i++) {
         projectiles.push(new EnemyProjectile(
           this.x + 30,
           this.y + 10,
-          i * 1.5,
-          2.5,
+          i * 1.8,
+          2.6,
           'star',
           '#ff007f'
         ));

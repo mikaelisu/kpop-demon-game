@@ -36,6 +36,19 @@ class PhysicsEngine {
     entity.x += entity.vx;
     this.resolveHorizontalCollisions(entity, tilemap, tileSize);
 
+    // Horizontal Stage Bounds Clamping (Prevent character from running off stage)
+    if (entity.charId) {
+      if (entity.x < 0) {
+        entity.x = 0;
+        entity.vx = 0;
+      }
+      const mapRight = (tilemap.cols || 60) * tileSize;
+      if (entity.x > mapRight - entity.width) {
+        entity.x = mapRight - entity.width;
+        entity.vx = 0;
+      }
+    }
+
     // Vertical Movement & Collision
     entity.y += entity.vy;
     this.resolveVerticalCollisions(entity, tilemap, tileSize);

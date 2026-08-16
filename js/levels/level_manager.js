@@ -12,6 +12,7 @@ class LevelManager {
     this.enemyProjectiles = [];
     this.playerProjectiles = [];
     this.boss = null;
+    this.companions = new CompanionManager();
     this.isArenaLocked = false;
     this.isStageCleared = false;
     this.clearTimer = 0;
@@ -24,6 +25,7 @@ class LevelManager {
     this.isStageCleared = false;
     this.isArenaLocked = false;
     this.clearTimer = 0;
+    if (this.companions) this.companions.projectiles = [];
 
     // Build Tilemap object
     const grid = this.stageData.buildTilemap();
@@ -81,6 +83,11 @@ class LevelManager {
       if (music) music.playTrack('boss');
       if (sfx) sfx.playBossRoar();
       if (camera) camera.shake(0.5, 6);
+    }
+
+    // 0. Update Companions (Demon Cat & Demon Raven Assist)
+    if (this.companions) {
+      this.companions.update(dt, player, this.enemies, this.boss, this.collectibles, this.enemyProjectiles, sfx, particles);
     }
 
     // 1. Update Player Projectiles
@@ -360,6 +367,11 @@ class LevelManager {
     // 5. Player Projectiles
     for (const pp of this.playerProjectiles) {
       pp.draw(ctx, camera);
+    }
+
+    // 6. Companions (Demon Cat & Demon Raven)
+    if (this.companions) {
+      this.companions.draw(ctx, spriteRenderer, camera);
     }
   }
 }

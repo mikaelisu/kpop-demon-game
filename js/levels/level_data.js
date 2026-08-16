@@ -33,7 +33,7 @@ const STAGES_DATA = [
     heightTiles: 12,
     tileSize: 32,
     playerStart: { x: 64, y: 220 },
-    bossType: "dj_dokkaebi",
+    bossType: "troll_dj",
     bossSpawn: { x: 1950, y: 180 },
     arenaLockX: 1700,
 
@@ -111,7 +111,7 @@ const STAGES_DATA = [
     heightTiles: 12,
     tileSize: 32,
     playerStart: { x: 64, y: 220 },
-    bossType: "dj_dokkaebi",
+    bossType: "troll_dj",
     bossSpawn: { x: 2100, y: 180 },
     arenaLockX: 1850,
 
@@ -183,7 +183,7 @@ const STAGES_DATA = [
     heightTiles: 12,
     tileSize: 32,
     playerStart: { x: 64, y: 220 },
-    bossType: "ramen_fiend",
+    bossType: "troll_chef",
     bossSpawn: { x: 2250, y: 160 },
     arenaLockX: 2000,
 
@@ -244,18 +244,18 @@ const STAGES_DATA = [
   },
 
   // =========================================================================
-  // STAGE 4: DEMON LORD'S NEON CASTLE FINALE
+  // STAGE 4: DEMON TROLL LORD'S NEON CASTLE FINALE
   // =========================================================================
   {
     id: 4,
-    name: "STAGE 4: DEMON CASTLE FINALE",
+    name: "STAGE 4: DEMON TROLL CASTLE",
     stageType: "castle",
     musicTrack: "boss",
     widthTiles: 85,
     heightTiles: 12,
     tileSize: 32,
     playerStart: { x: 64, y: 220 },
-    bossType: "gwi_ma",
+    bossType: "troll_king",
     bossSpawn: { x: 2400, y: 160 },
     arenaLockX: 2150,
 

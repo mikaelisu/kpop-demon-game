@@ -24,11 +24,14 @@ An authentic 8-bit NES-style 2D side-scrolling action platformer inspired by cla
   - **Enemy Head Bouncing**: Landing on enemy heads automatically bounces the player upward.
   - **Generous Forgiveness**: Built-in 0.22s Coyote Time, 0.22s Jump Buffering, and instant fluid jumping.
 
-- **🌆 4 Handcrafted Stages & 3 Boss Battles**:
-  - **Stage 1**: Neon Night Market & Seoul Street (*Boss: DJ Dokkaebi*)
-  - **Stage 2**: Haunted K-Pop Concert Dome (*Boss: DJ Dokkaebi Encore*)
-  - **Stage 3**: Mystic Noodle Temple & Cherry Blossom Garden (*Boss: Giant Ramen Fiend*)
-  - **Stage 4**: Demon Castle Rooftops Climax (*Climax Boss: Gwi-Ma, The Demon King*)
+- **🐾 Magical Assist Companions (Familiars)**:
+  - **🐾 Bogi (Demon Cat)**: Floats gently behind the player with dual glowing spirit flame tails. Automatically shoots homing spirit flame orbs at nearby demons and acts as an item magnet to pull distant ramen bowls and stars!
+  - **🦅 Karasu (Demon Raven)**: Soars above the player with animated shadow wings and glowing violet eyes. Executes high-speed dive-bomb talon strikes to stun demons and slice through incoming enemy bullets!
+
+- **👹 Mythical Demon Troll People Bosses (Dokkaebi Troll Chiefs)**:
+  - **Stage 1 & 2: Chief Dokkaebi Troll ("DJ Troll Brute")**: Muscular green demon troll with golden horns, tiger loincloth, and a massive spiked cyber boombox club that sends shockwaves across the floor!
+  - **Stage 3: Gluttonous Ramen Troll ("Chef Troll Noodle-Lord")**: Hulking fiery demon troll chef with obsidian ram horns and flaming beard, wielding giant spiked chopstick spears and throwing boiling chili boulders.
+  - **Stage 4: Emperor Gwi-Ma ("Demon Troll Overlord")**: Supreme ancient Cyber Demon Troll King in ornate obsidian shogun armor with quadruple horns, glowing troll face mask, and a colossal double-bladed dark saber polearm!
 
 - **📸 K-Pop Photocard Binder & Minigame**:
   - Unlockable 8-bit holographic idol cards in the binder album.

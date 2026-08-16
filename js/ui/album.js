@@ -14,7 +14,9 @@ class PhotocardAlbum {
       { id: 'mira', name: 'MIRA ★ FLAME DANCER', role: 'HUNTR/X Main Dancer & Gokdo', quote: '"Extra spicy ramen gives me unstoppable power!"', color: '#ffaa00', rarity: '★★★ SSR' },
       { id: 'zoey', name: 'ZOEY ★ STAR MAKNAE', role: 'HUNTR/X Main Rapper & Shinkal', quote: '"Catch these light daggers and shining star notes!"', color: '#ff1493', rarity: '★★★ SSR' },
       { id: 'jinu', name: 'JINU ★ SAJA LEADER', role: 'Saja Boys Leader & Demon Hunter', quote: '"Feel the electric rhythm, strike with honor!"', color: '#cc00ff', rarity: '★★★ SSR' },
-      { id: 'dj_dokkaebi', name: 'DJ DOKKAEBI', role: 'Beats Goblin Producer', quote: '"Drop the beat and pass the noodles!"', color: '#2a9d8f', rarity: '★★ SR' },
+      { id: 'demon_cat', name: 'BOGI ★ DEMON CAT', role: 'Spirit Flame Familiar', quote: '"Purrs with dual fire tails and vacuums ramen bowls!"', color: '#ff007f', rarity: '★★★ SSR' },
+      { id: 'demon_raven', name: 'KARASU ★ SHADOW RAVEN', role: 'Sky Scout & Bullet Deflector', quote: '"Dive-bombs demons and slices evil with shadow wings!"', color: '#9d4edd', rarity: '★★★ SSR' },
+      { id: 'troll_king', name: 'EMPEROR GWI-MA', role: 'Demon Troll Overlord Boss', quote: '"No idol blade shall pierce my ancient obsidian armor!"', color: '#ff0055', rarity: '★★★★ UR' },
       { id: 'golden_ramen', name: 'GOLDEN RAMEN MASTER', role: 'Legendary Powerup', quote: '"The ultimate noodle bowl of pure rainbow fever!"', color: '#ffd700', rarity: '★★★★ UR' }
     ];
   }
@@ -60,15 +62,33 @@ class PhotocardAlbum {
     // Sprite preview on left
     if (card.id === 'golden_ramen') {
       spriteRenderer.drawRamenBowl(ctx, cX + 24, cY + 40, 'rainbow', this.animTimer, 2.5);
-    } else if (card.id === 'dj_dokkaebi') {
-      spriteRenderer.drawEnemy(ctx, {
+    } else if (card.id === 'demon_cat') {
+      spriteRenderer.drawDemonCat(ctx, {
         x: cX + 20,
         y: cY + 45,
-        type: 'dokkaebi',
         facingRight: true,
         animTimer: this.animTimer,
-        isHit: false
-      }, 2.0);
+        isAttacking: false
+      }, 2.4);
+    } else if (card.id === 'demon_raven') {
+      spriteRenderer.drawDemonRaven(ctx, {
+        x: cX + 20,
+        y: cY + 45,
+        facingRight: true,
+        animTimer: this.animTimer,
+        isDiving: false
+      }, 2.4);
+    } else if (card.id === 'troll_king') {
+      spriteRenderer.drawBoss(ctx, {
+        x: cX + 16,
+        y: cY + 30,
+        type: 'troll_king',
+        facingRight: true,
+        animTimer: this.animTimer,
+        isHit: false,
+        hp: 12,
+        maxHp: 12
+      }, 1.2);
     } else {
       spriteRenderer.drawPlayer(ctx, {
         x: cX + 20,

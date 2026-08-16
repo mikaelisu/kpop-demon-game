@@ -629,123 +629,398 @@ class SpriteRenderer {
   }
 
   // =========================================================================
-  // BOSS MONSTERS
+  // COMPANION ASSIST SPRITES (DEMON CAT & DEMON RAVEN)
   // =========================================================================
 
-  drawBoss(ctx, boss, scale = 2) {
-    const { x, y, type, facingRight, animTimer, isHit, hp, maxHp, attackState } = boss;
+  drawDemonCat(ctx, cat, scale = 1.5) {
+    const { x, y, facingRight, animTimer, isAttacking } = cat;
 
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
 
     if (!facingRight) {
       ctx.scale(-1, 1);
-      ctx.translate(-40 * scale, 0);
+      ctx.translate(-16 * scale, 0);
+    }
+
+    const floatY = Math.sin(animTimer * 6) * 2;
+    const tailWag = Math.sin(animTimer * 10) * 3;
+
+    // Dual Glowing Fiery Demon Tails (Nekomata flame tails)
+    ctx.fillStyle = '#ff007f';
+    ctx.shadowColor = '#ff007f';
+    ctx.shadowBlur = 8;
+    // Tail 1
+    ctx.fillRect((-4 + tailWag) * scale, (6 + floatY) * scale, 4 * scale, 3 * scale);
+    ctx.fillRect((-7 + tailWag) * scale, (3 + floatY) * scale, 4 * scale, 4 * scale);
+    ctx.fillStyle = '#ffe600';
+    ctx.fillRect((-9 + tailWag) * scale, (2 + floatY) * scale, 3 * scale, 3 * scale); // Flame tip
+
+    // Tail 2
+    ctx.fillStyle = '#9d4edd';
+    ctx.fillRect((-3 - tailWag) * scale, (10 + floatY) * scale, 4 * scale, 3 * scale);
+    ctx.fillRect((-6 - tailWag) * scale, (8 + floatY) * scale, 4 * scale, 4 * scale);
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect((-8 - tailWag) * scale, (7 + floatY) * scale, 3 * scale, 3 * scale);
+
+    // Dark Sleek Cat Body
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#16082c';
+    ctx.fillRect(0, (5 + floatY) * scale, 12 * scale, 9 * scale);
+    ctx.fillRect(2 * scale, (3 + floatY) * scale, 9 * scale, 8 * scale);
+
+    // Pointy Cat Ears
+    ctx.fillStyle = '#240046';
+    ctx.fillRect(2 * scale, (0 + floatY) * scale, 3 * scale, 4 * scale);
+    ctx.fillRect(8 * scale, (0 + floatY) * scale, 3 * scale, 4 * scale);
+    // Inner ear glow
+    ctx.fillStyle = '#ff007f';
+    ctx.fillRect(3 * scale, (1 + floatY) * scale, 1 * scale, 2 * scale);
+    ctx.fillRect(9 * scale, (1 + floatY) * scale, 1 * scale, 2 * scale);
+
+    // Big Glowing Cat Eyes
+    ctx.fillStyle = '#ffe600';
+    ctx.fillRect(4 * scale, (4 + floatY) * scale, 2 * scale, 3 * scale);
+    ctx.fillRect(8 * scale, (4 + floatY) * scale, 2 * scale, 3 * scale);
+    ctx.fillStyle = '#110022'; // Slit pupil
+    ctx.fillRect(5 * scale, (4 + floatY) * scale, 1 * scale, 3 * scale);
+    ctx.fillRect(9 * scale, (4 + floatY) * scale, 1 * scale, 3 * scale);
+
+    // Pink nose & whiskers
+    ctx.fillStyle = '#ff77bb';
+    ctx.fillRect(6 * scale, (7 + floatY) * scale, 2 * scale, 1 * scale);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(10 * scale, (6 + floatY) * scale, 3 * scale, 1 * scale);
+    ctx.fillRect(10 * scale, (8 + floatY) * scale, 3 * scale, 1 * scale);
+
+    // Front Paws / Attack Swipe
+    if (isAttacking) {
+      ctx.fillStyle = '#00f0ff';
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(12 * scale, (4 + floatY) * scale, 4 * scale, 4 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(14 * scale, (3 + floatY) * scale, 2 * scale, 2 * scale);
+    } else {
+      ctx.fillStyle = '#240046';
+      ctx.fillRect(8 * scale, (12 + floatY) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(2 * scale, (12 + floatY) * scale, 3 * scale, 3 * scale);
+    }
+
+    ctx.restore();
+  }
+
+  drawDemonRaven(ctx, raven, scale = 1.5) {
+    const { x, y, facingRight, animTimer, isDiving } = raven;
+
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+
+    if (!facingRight) {
+      ctx.scale(-1, 1);
+      ctx.translate(-18 * scale, 0);
+    }
+
+    const wingFlap = Math.sin(animTimer * 14) * 4;
+
+    // Shadow Raven Wings
+    ctx.fillStyle = '#3c096c';
+    ctx.shadowColor = '#7b2cbf';
+    ctx.shadowBlur = 6;
+    if (isDiving) {
+      // Swept back dive wings
+      ctx.fillRect(-2 * scale, -2 * scale, 14 * scale, 4 * scale);
+      ctx.fillRect(-6 * scale, 0, 10 * scale, 3 * scale);
+    } else {
+      // Flapping wings
+      ctx.fillRect(1 * scale, (2 + wingFlap) * scale, 12 * scale, 4 * scale);
+      ctx.fillRect(-2 * scale, (4 + wingFlap) * scale, 6 * scale, 3 * scale);
+      ctx.fillRect(10 * scale, (4 + wingFlap) * scale, 6 * scale, 3 * scale);
+    }
+
+    // Sleek Raven Body
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#10002b';
+    ctx.fillRect(2 * scale, 4 * scale, 10 * scale, 6 * scale);
+    ctx.fillRect(4 * scale, 2 * scale, 7 * scale, 5 * scale);
+
+    // Glowing Violet Demon Eyes
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect(8 * scale, 3 * scale, 2 * scale, 2 * scale);
+
+    // Sharp Cyber Beak
+    ctx.fillStyle = '#ffd700';
+    ctx.fillRect(11 * scale, 4 * scale, 4 * scale, 2 * scale);
+    ctx.fillRect(11 * scale, 5 * scale, 2 * scale, 1 * scale);
+
+    // Sharp Talons
+    ctx.fillStyle = '#ff007f';
+    ctx.fillRect(5 * scale, 10 * scale, 2 * scale, 3 * scale);
+    ctx.fillRect(8 * scale, 10 * scale, 2 * scale, 3 * scale);
+
+    // Trailing Dark Shadow Feathers
+    if (isDiving) {
+      ctx.fillStyle = '#cc00ff';
+      ctx.shadowColor = '#cc00ff';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(-8 * scale, 2 * scale, 4 * scale, 2 * scale);
+      ctx.fillRect(-12 * scale, 0, 3 * scale, 2 * scale);
+    }
+
+    ctx.restore();
+  }
+
+  // =========================================================================
+  // DEMON TROLL PEOPLE BOSSES
+  // =========================================================================
+
+  drawBoss(ctx, boss, scale = 2) {
+    const { x, y, type, facingRight, animTimer, isHit, hp, maxHp } = boss;
+
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+
+    if (!facingRight) {
+      ctx.scale(-1, 1);
+      ctx.translate(-42 * scale, 0);
     }
 
     if (isHit && Math.floor(animTimer * 20) % 2 === 0) {
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, 40 * scale, 40 * scale);
+      ctx.fillRect(0, 0, 42 * scale, 42 * scale);
       ctx.restore();
       return;
     }
 
-    if (type === 'dj_dokkaebi') {
-      // BOSS 1: DJ Dokkaebi (Cyan goblin wearing giant gold headphones & boombox)
-      const bop = Math.abs(Math.sin(animTimer * 10)) * 4;
+    // =======================================================================
+    // BOSS 1: CHIEF DOKKAEBI TROLL ("DJ TROLL BRUTE")
+    // =======================================================================
+    if (type === 'dj_dokkaebi' || type === 'troll_dj') {
+      const bop = Math.abs(Math.sin(animTimer * 8)) * 3;
+      const clubSwing = Math.sin(animTimer * 4) * 4;
 
-      // Turntable DJ Booth in front
-      ctx.fillStyle = '#140026';
-      ctx.fillRect(4 * scale, 26 * scale, 32 * scale, 14 * scale);
-      // Vinyl record glow
-      ctx.fillStyle = '#00f0ff';
-      ctx.fillRect(7 * scale, 28 * scale, 8 * scale, 3 * scale);
-      ctx.fillStyle = '#ff007f';
-      ctx.fillRect(25 * scale, 28 * scale, 8 * scale, 3 * scale);
+      // 1. Muscular Troll Body & Chest
+      ctx.fillStyle = '#2d6a4f'; // Green Troll Skin
+      ctx.fillRect(10 * scale, (12 - bop) * scale, 22 * scale, 18 * scale);
+      // Muscular chest definition
+      ctx.fillStyle = '#1b4332';
+      ctx.fillRect(13 * scale, (16 - bop) * scale, 7 * scale, 6 * scale);
+      ctx.fillRect(22 * scale, (16 - bop) * scale, 7 * scale, 6 * scale);
 
-      // DJ Body
-      ctx.fillStyle = '#2a9d8f';
-      ctx.fillRect(10 * scale, (10 - bop) * scale, 20 * scale, 18 * scale);
+      // 2. Muscular Troll Arms & Biceps
+      ctx.fillStyle = '#2d6a4f';
+      ctx.fillRect(4 * scale, (14 - bop) * scale, 7 * scale, 12 * scale);
+      ctx.fillRect(31 * scale, (14 - bop + clubSwing) * scale, 8 * scale, 12 * scale);
+      // Studded Iron Bracers
+      ctx.fillStyle = '#7209b7';
+      ctx.fillRect(4 * scale, (22 - bop) * scale, 7 * scale, 4 * scale);
+      ctx.fillRect(32 * scale, (22 - bop + clubSwing) * scale, 7 * scale, 4 * scale);
 
-      // Giant Golden DJ Headphones
+      // 3. Fierce Horned Troll Head
+      ctx.fillStyle = '#2d6a4f';
+      ctx.fillRect(12 * scale, (4 - bop) * scale, 18 * scale, 11 * scale);
+
+      // Wild Spiky Punk Troll Hair
+      ctx.fillStyle = '#140126';
+      ctx.fillRect(11 * scale, (0 - bop) * scale, 20 * scale, 6 * scale);
+      ctx.fillRect(9 * scale, (2 - bop) * scale, 4 * scale, 5 * scale);
+      ctx.fillRect(29 * scale, (2 - bop) * scale, 4 * scale, 5 * scale);
+
+      // Curved Golden Troll Horns
       ctx.fillStyle = '#ffd700';
-      ctx.fillRect(6 * scale, (8 - bop) * scale, 6 * scale, 10 * scale); // Left cup
-      ctx.fillRect(28 * scale, (8 - bop) * scale, 6 * scale, 10 * scale); // Right cup
-      ctx.fillRect(9 * scale, (4 - bop) * scale, 22 * scale, 4 * scale); // Headband
+      ctx.shadowColor = '#ffe600';
+      ctx.shadowBlur = 8;
+      ctx.fillRect(8 * scale, (-4 - bop) * scale, 5 * scale, 6 * scale);
+      ctx.fillRect(6 * scale, (-7 - bop) * scale, 4 * scale, 5 * scale);
+      ctx.fillRect(29 * scale, (-4 - bop) * scale, 5 * scale, 6 * scale);
+      ctx.fillRect(32 * scale, (-7 - bop) * scale, 4 * scale, 5 * scale);
+      ctx.shadowBlur = 0;
 
-      // Cool Sunglasses
-      ctx.fillStyle = '#110022';
-      ctx.fillRect(13 * scale, (12 - bop) * scale, 14 * scale, 5 * scale);
-      ctx.fillStyle = '#00f0ff';
-      ctx.fillRect(14 * scale, (13 - bop) * scale, 5 * scale, 2 * scale);
-      ctx.fillRect(21 * scale, (13 - bop) * scale, 5 * scale, 2 * scale);
+      // Fierce Glowing Eyes & Fangs
+      ctx.fillStyle = '#ff0055';
+      ctx.fillRect(15 * scale, (7 - bop) * scale, 4 * scale, 3 * scale);
+      ctx.fillRect(23 * scale, (7 - bop) * scale, 4 * scale, 3 * scale);
+      ctx.fillStyle = '#ffffff'; // White pupil shine
+      ctx.fillRect(16 * scale, (7 - bop) * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(24 * scale, (7 - bop) * scale, 2 * scale, 2 * scale);
 
-      // Big Grin
+      // Grinning Troll Fangs
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(15 * scale, (19 - bop) * scale, 10 * scale, 3 * scale);
-      ctx.fillStyle = '#ffd700';
-      ctx.fillRect(18 * scale, (19 - bop) * scale, 2 * scale, 3 * scale); // Gold tooth
+      ctx.fillRect(16 * scale, (12 - bop) * scale, 2 * scale, 3 * scale);
+      ctx.fillRect(24 * scale, (12 - bop) * scale, 2 * scale, 3 * scale);
 
-    } else if (type === 'ramen_fiend') {
-      // BOSS 2: Giant Ramen Fiend (Living spicy noodle beast)
+      // 4. Tiger Hide Loincloth & Troll Belt
+      ctx.fillStyle = '#ffaa00';
+      ctx.fillRect(10 * scale, (28 - bop) * scale, 22 * scale, 8 * scale);
+      ctx.fillStyle = '#000000'; // Tiger stripes
+      ctx.fillRect(13 * scale, (29 - bop) * scale, 3 * scale, 4 * scale);
+      ctx.fillRect(21 * scale, (29 - bop) * scale, 3 * scale, 4 * scale);
+      ctx.fillRect(26 * scale, (30 - bop) * scale, 3 * scale, 3 * scale);
+
+      // Muscular Troll Legs & Iron Stomp Boots
+      ctx.fillStyle = '#1b4332';
+      ctx.fillRect(12 * scale, (34 - bop) * scale, 6 * scale, 8 * scale);
+      ctx.fillRect(24 * scale, (34 - bop) * scale, 6 * scale, 8 * scale);
+      ctx.fillStyle = '#3a096c';
+      ctx.fillRect(10 * scale, (39 - bop) * scale, 8 * scale, 4 * scale);
+      ctx.fillRect(24 * scale, (39 - bop) * scale, 8 * scale, 4 * scale);
+
+      // 5. Giant Spiked Cyber Boombox Club
+      ctx.save();
+      ctx.fillStyle = '#10002b';
+      ctx.fillRect(34 * scale, (6 - bop + clubSwing) * scale, 8 * scale, 28 * scale);
+      ctx.fillStyle = '#00f0ff';
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(32 * scale, (2 - bop + clubSwing) * scale, 12 * scale, 10 * scale);
+      // Neon Spikes
+      ctx.fillStyle = '#ff007f';
+      ctx.fillRect(30 * scale, (4 - bop + clubSwing) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(43 * scale, (4 - bop + clubSwing) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(36 * scale, (-1 - bop + clubSwing) * scale, 4 * scale, 3 * scale);
+      ctx.restore();
+
+    // =======================================================================
+    // BOSS 2: GLUTTONOUS RAMEN TROLL ("CHEF TROLL NOODLE-LORD")
+    // =======================================================================
+    } else if (type === 'ramen_fiend' || type === 'troll_chef') {
       const wobble = Math.sin(animTimer * 6) * 3;
 
-      // Boiling Broth Body
-      ctx.fillStyle = '#e76f51';
-      ctx.fillRect(6 * scale, (8 + wobble) * scale, 28 * scale, 26 * scale);
-      ctx.fillRect(3 * scale, (14 + wobble) * scale, 34 * scale, 18 * scale);
+      // 1. Massive Fiery Red Troll Body
+      ctx.fillStyle = '#b7094c'; // Crimson Demon Troll Skin
+      ctx.fillRect(8 * scale, (10 + wobble) * scale, 26 * scale, 22 * scale);
+      ctx.fillRect(4 * scale, (14 + wobble) * scale, 34 * scale, 14 * scale);
 
-      // Noodle Tentacles
-      ctx.fillStyle = '#fff0a3';
-      for (let i = 0; i < 5; i++) {
-        const tx = 6 + i * 6 + Math.sin(animTimer * 8 + i) * 3;
-        ctx.fillRect(tx * scale, (2 + wobble) * scale, 3 * scale, 10 * scale);
-      }
-
-      // Naruto Fishcake Eyes (Spinning)
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(10 * scale, (12 + wobble) * scale, 8 * scale, 8 * scale);
-      ctx.fillRect(22 * scale, (12 + wobble) * scale, 8 * scale, 8 * scale);
-      ctx.fillStyle = '#ff1493';
-      ctx.fillRect(13 * scale, (15 + wobble) * scale, 3 * scale, 3 * scale);
-      ctx.fillRect(25 * scale, (15 + wobble) * scale, 3 * scale, 3 * scale);
-
-      // Giant mouth full of steaming soup
+      // Chef Broth Apron & Chili Demon Belt
+      ctx.fillStyle = '#ffd166';
+      ctx.fillRect(12 * scale, (14 + wobble) * scale, 18 * scale, 16 * scale);
       ctx.fillStyle = '#ff3300';
-      ctx.fillRect(12 * scale, (23 + wobble) * scale, 16 * scale, 6 * scale);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(14 * scale, (23 + wobble) * scale, 3 * scale, 2 * scale);
-      ctx.fillRect(23 * scale, (23 + wobble) * scale, 3 * scale, 2 * scale);
+      ctx.fillRect(16 * scale, (18 + wobble) * scale, 10 * scale, 8 * scale); // Steaming bowl emblem
 
+      // 2. Horned Chef Troll Head
+      ctx.fillStyle = '#b7094c';
+      ctx.fillRect(11 * scale, (2 + wobble) * scale, 20 * scale, 12 * scale);
+
+      // White Chef Headband with Gold Broth Jewel
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(9 * scale, (1 + wobble) * scale, 24 * scale, 4 * scale);
+      ctx.fillStyle = '#ffd700';
+      ctx.fillRect(19 * scale, (0 + wobble) * scale, 4 * scale, 4 * scale);
+
+      // Flaming Troll Beard
+      ctx.fillStyle = '#ff5400';
+      ctx.shadowColor = '#ff5400';
+      ctx.shadowBlur = 8;
+      ctx.fillRect(10 * scale, (11 + wobble) * scale, 22 * scale, 6 * scale);
+      ctx.fillRect(13 * scale, (16 + wobble) * scale, 16 * scale, 4 * scale);
+      ctx.shadowBlur = 0;
+
+      // Massive Curled Obsidian Ram Horns
+      ctx.fillStyle = '#10002b';
+      ctx.fillRect(6 * scale, (-3 + wobble) * scale, 6 * scale, 7 * scale);
+      ctx.fillRect(2 * scale, (1 + wobble) * scale, 5 * scale, 6 * scale);
+      ctx.fillRect(30 * scale, (-3 + wobble) * scale, 6 * scale, 7 * scale);
+      ctx.fillRect(35 * scale, (1 + wobble) * scale, 5 * scale, 6 * scale);
+
+      // Blazing Yellow Troll Eyes
+      ctx.fillStyle = '#ffe600';
+      ctx.fillRect(14 * scale, (5 + wobble) * scale, 4 * scale, 3 * scale);
+      ctx.fillRect(24 * scale, (5 + wobble) * scale, 4 * scale, 3 * scale);
+      ctx.fillStyle = '#ff0000';
+      ctx.fillRect(15 * scale, (6 + wobble) * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(25 * scale, (6 + wobble) * scale, 2 * scale, 2 * scale);
+
+      // 3. Troll Legs & Fiery Boots
+      ctx.fillStyle = '#590d22';
+      ctx.fillRect(10 * scale, (30 + wobble) * scale, 8 * scale, 10 * scale);
+      ctx.fillRect(24 * scale, (30 + wobble) * scale, 8 * scale, 10 * scale);
+      ctx.fillStyle = '#ffaa00';
+      ctx.fillRect(8 * scale, (37 + wobble) * scale, 10 * scale, 4 * scale);
+      ctx.fillRect(24 * scale, (37 + wobble) * scale, 10 * scale, 4 * scale);
+
+      // 4. Twin Giant Spiked Chopsticks Weapons
+      ctx.fillStyle = '#ffd700';
+      ctx.shadowColor = '#ffe600';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(36 * scale, (-4 + wobble) * scale, 3 * scale, 36 * scale);
+      ctx.fillRect(39 * scale, (-2 + wobble) * scale, 3 * scale, 36 * scale);
+      ctx.restore();
+
+    // =======================================================================
+    // BOSS 3: EMPEROR GWI-MA ("DEMON TROLL KING")
+    // =======================================================================
     } else {
-      // BOSS 3: Shadow Idol Demon King (Lord Neon)
       const hover = Math.sin(animTimer * 5) * 4;
 
-      // Cyber Demon Wings (Neon Purple & Cyan)
-      ctx.fillStyle = '#480ca8';
-      ctx.fillRect(0, (4 + hover) * scale, 12 * scale, 20 * scale);
-      ctx.fillRect(28 * scale, (4 + hover) * scale, 12 * scale, 20 * scale);
+      // 1. Cyber Troll Demonic Cape / Wings
+      ctx.fillStyle = '#3c096c';
+      ctx.shadowColor = '#7b2cbf';
+      ctx.shadowBlur = 12;
+      ctx.fillRect(-2 * scale, (4 + hover) * scale, 14 * scale, 28 * scale);
+      ctx.fillRect(30 * scale, (4 + hover) * scale, 14 * scale, 28 * scale);
       ctx.fillStyle = '#00f0ff';
-      ctx.fillRect(2 * scale, (6 + hover) * scale, 8 * scale, 3 * scale);
-      ctx.fillRect(30 * scale, (6 + hover) * scale, 8 * scale, 3 * scale);
+      ctx.fillRect(0, (6 + hover) * scale, 8 * scale, 4 * scale);
+      ctx.fillRect(34 * scale, (6 + hover) * scale, 8 * scale, 4 * scale);
 
-      // Stylish Dark Idol Trenchcoat
-      ctx.fillStyle = '#10002b';
-      ctx.fillRect(12 * scale, (8 + hover) * scale, 16 * scale, 28 * scale);
-      // Demon Fox Mask
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(13 * scale, (2 + hover) * scale, 14 * scale, 10 * scale);
-      ctx.fillStyle = '#ff0055';
-      ctx.fillRect(15 * scale, (5 + hover) * scale, 3 * scale, 3 * scale);
-      ctx.fillRect(22 * scale, (5 + hover) * scale, 3 * scale, 3 * scale);
-      ctx.fillRect(18 * scale, (8 + hover) * scale, 4 * scale, 2 * scale);
-
-      // Twin Glowing Dark Saber Lightsticks
+      // 2. Royal Cyber Troll Shogun Armor
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#10002b'; // Dark Obsidian Armor
+      ctx.fillRect(10 * scale, (10 + hover) * scale, 22 * scale, 24 * scale);
+      // Glowing Royal Crest
       ctx.fillStyle = '#ff007f';
       ctx.shadowColor = '#ff007f';
+      ctx.shadowBlur = 8;
+      ctx.fillRect(15 * scale, (14 + hover) * scale, 12 * scale, 10 * scale);
+      ctx.fillStyle = '#ffe600';
+      ctx.fillRect(18 * scale, (17 + hover) * scale, 6 * scale, 4 * scale);
+
+      // 3. Ancient Demon Troll King Mask & Horns
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#240046';
+      ctx.fillRect(12 * scale, (2 + hover) * scale, 18 * scale, 12 * scale);
+
+      // Quadruple Obsidian Emperor Horns
+      ctx.fillStyle = '#ffd700';
+      ctx.shadowColor = '#ffe600';
       ctx.shadowBlur = 10;
-      ctx.fillRect(4 * scale, (14 + hover) * scale, 3 * scale, 22 * scale);
-      ctx.fillRect(33 * scale, (14 + hover) * scale, 3 * scale, 22 * scale);
+      // Main Horns
+      ctx.fillRect(7 * scale, (-6 + hover) * scale, 6 * scale, 10 * scale);
+      ctx.fillRect(4 * scale, (-10 + hover) * scale, 5 * scale, 6 * scale);
+      ctx.fillRect(29 * scale, (-6 + hover) * scale, 6 * scale, 10 * scale);
+      ctx.fillRect(33 * scale, (-10 + hover) * scale, 5 * scale, 6 * scale);
+      // Secondary Horns
+      ctx.fillStyle = '#ff007f';
+      ctx.fillRect(10 * scale, (-2 + hover) * scale, 3 * scale, 6 * scale);
+      ctx.fillRect(29 * scale, (-2 + hover) * scale, 3 * scale, 6 * scale);
+
+      // Piercing Red Troll Eyes Behind Demon Mask
+      ctx.fillStyle = '#ff0055';
+      ctx.shadowColor = '#ff0055';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(14 * scale, (6 + hover) * scale, 4 * scale, 3 * scale);
+      ctx.fillRect(24 * scale, (6 + hover) * scale, 4 * scale, 3 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(15 * scale, (6 + hover) * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(25 * scale, (6 + hover) * scale, 2 * scale, 2 * scale);
+
+      // Armored Troll Legs
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#10002b';
+      ctx.fillRect(12 * scale, (32 + hover) * scale, 6 * scale, 8 * scale);
+      ctx.fillRect(24 * scale, (32 + hover) * scale, 6 * scale, 8 * scale);
+      ctx.fillStyle = '#ffd700';
+      ctx.fillRect(10 * scale, (38 + hover) * scale, 8 * scale, 4 * scale);
+      ctx.fillRect(24 * scale, (38 + hover) * scale, 8 * scale, 4 * scale);
+
+      // 4. Colossal Double-Bladed Dark Saber Troll Polearm
+      ctx.fillStyle = '#ff007f';
+      ctx.shadowColor = '#ff007f';
+      ctx.shadowBlur = 14;
+      ctx.fillRect(36 * scale, (-8 + hover) * scale, 4 * scale, 48 * scale);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(34 * scale, (8 + hover) * scale, 8 * scale, 6 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(37 * scale, (-6 + hover) * scale, 2 * scale, 44 * scale);
     }
 
     ctx.restore();
