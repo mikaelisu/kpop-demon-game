@@ -24,7 +24,7 @@ class PhysicsEngine {
   /**
    * Update Entity Tile Physics & Collisions
    */
-  updateEntity(entity, tilemap, tileSize = 32) {
+  updateEntity(entity, tilemap, tileSize = 32, sfx = null, particles = null) {
     if (!tilemap) return;
 
     // Apply Gravity
@@ -51,7 +51,7 @@ class PhysicsEngine {
 
     // Vertical Movement & Collision
     entity.y += entity.vy;
-    this.resolveVerticalCollisions(entity, tilemap, tileSize);
+    this.resolveVerticalCollisions(entity, tilemap, tileSize, sfx, particles);
 
     // Pit Safety & Bottom Stage Boundary Check
     const mapBottom = (tilemap.rows || 12) * tileSize;
@@ -98,51 +98,59 @@ class PhysicsEngine {
     }
   }
 
-  resolveVerticalCollisions(entity, tilemap, tileSize) {
+  resolveVerticalCollisions(entity, tilemap, tileSize, sfx = null, particles = null) {
     const hitbox = entity.getHitbox();
     const minTileX = Math.floor(hitbox.x / tileSize);
     const maxTileX = Math.floor((hitbox.x + hitbox.width - 0.01) / tileSize);
     const minTileY = Math.floor(hitbox.y / tileSize);
     const maxTileY = Math.floor((hitbox.y + hitbox.height - 0.01) / tileSize);
 
-    const wasOnGround = entity.onGround;
     entity.onGround = false;
 
     for (let ty = minTileY; ty <= maxTileY; ty++) {
       for (let tx = minTileX; tx <= maxTileX; tx++) {
         const tile = tilemap.getTile(tx, ty);
 
-        // Solid Ground (Tile 1)
-        if (tile === 1) {
-          if (entity.vy > 0) {
-            // Landing on ground
-            entity.y = ty * tileSize - (hitbox.y - entity.y + hitbox.height);
+        // 1. Bouncy Ramen Spring (Tile 3)
+        if (tile === 3) {
+          const springTop = ty * tileSize;
+          const entityBottom = hitbox.y + hitbox.height;
+          // Trigger bounce when moving downward onto the spring pad
+          if (entity.vy >= 0 && entityBottom >= springTop && (entityBottom - entity.vy) <= springTop + 14) {
+            entity.y = springTop - (hitbox.y - entity.y + hitbox.height) - 1;
+            entity.vy = -10.5; // High Spring Launch!
+            entity.onGround = false;
+            if (entity.onSpringBounce) entity.onSpringBounce(sfx, particles);
+            return; // Bounce resolved! Skip further downward tile checks
+          }
+        }
+
+        // 2. Solid Ground (Tile 1)
+        else if (tile === 1) {
+          const tileTop = ty * tileSize;
+          const tileBottom = (ty + 1) * tileSize;
+
+          if (entity.vy > 0 && (hitbox.y + hitbox.height) >= tileTop && (hitbox.y + hitbox.height - entity.vy) <= tileTop + 12) {
+            // Landing on top of solid ground
+            entity.y = tileTop - (hitbox.y - entity.y + hitbox.height);
             entity.vy = 0;
             entity.onGround = true;
-          } else if (entity.vy < 0) {
-            // Hitting ceiling
-            entity.y = (ty + 1) * tileSize - (hitbox.y - entity.y);
+          } else if (entity.vy < 0 && hitbox.y <= tileBottom && (hitbox.y - entity.vy) >= tileBottom - 12) {
+            // Hitting ceiling above player
+            entity.y = tileBottom - (hitbox.y - entity.y);
             entity.vy = 0;
           }
         } 
-        // One-Way Platform (Tile 2)
+
+        // 3. One-Way Platform (Tile 2)
         else if (tile === 2 && entity.vy > 0) {
           const platformTop = ty * tileSize;
           const entityBottom = hitbox.y + hitbox.height;
           // Only collide if entity was above platform prior to this frame
-          if (entityBottom - entity.vy <= platformTop + 4 && entityBottom >= platformTop) {
+          if (entityBottom - entity.vy <= platformTop + 6 && entityBottom >= platformTop) {
             entity.y = platformTop - (hitbox.y - entity.y + hitbox.height);
             entity.vy = 0;
             entity.onGround = true;
-          }
-        }
-        // Bouncy Ramen Spring (Tile 3)
-        else if (tile === 3) {
-          if (entity.vy > 0 && hitbox.y + hitbox.height >= ty * tileSize) {
-            entity.y = ty * tileSize - (hitbox.y - entity.y + hitbox.height);
-            entity.vy = -9.5; // Super High Spring Bounce
-            entity.onGround = false;
-            if (entity.onSpringBounce) entity.onSpringBounce();
           }
         }
       }

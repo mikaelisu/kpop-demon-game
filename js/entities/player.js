@@ -205,7 +205,7 @@ class Player {
 
     // Apply Physics
     if (physics) {
-      physics.updateEntity(this, tilemap, 32);
+      physics.updateEntity(this, tilemap, 32, sfx, particles);
     }
   }
 
@@ -356,8 +356,11 @@ class Player {
     if (particles) particles.spawnSparkleBurst(this.x + 14, this.y + 30, 8, '#ffe600');
   }
 
-  onSpringBounce() {
+  onSpringBounce(sfx, particles) {
     this.state = 'jump';
+    this.canDoubleJump = true;
+    if (sfx) sfx.playBounce();
+    if (particles) particles.spawnSparkleBurst(this.x + 14, this.y + 32, 14, '#ffe600');
   }
 
   heal(amount) {
