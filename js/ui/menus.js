@@ -5,9 +5,10 @@
 
 class MenuManager {
   constructor() {
-    this.currentScreen = 'title'; // 'title', 'character_select', 'stage_select', 'assist_settings', 'pause', 'game_over', 'game_win'
+    this.currentScreen = 'title'; // 'title', 'character_select', 'stage_select', 'feast_select', 'assist_settings', 'pause', 'game_over', 'game_win'
     this.selectedCharIndex = 0;
     this.selectedStageIndex = 0;
+    this.selectedFeastIndex = 0;
     this.menuSelection = 0;
     this.animTimer = 0;
 
@@ -32,6 +33,8 @@ class MenuManager {
       this.drawCharacterSelect(ctx, spriteRenderer, viewportWidth, viewportHeight);
     } else if (this.currentScreen === 'stage_select') {
       this.drawStageSelect(ctx, spriteRenderer, viewportWidth, viewportHeight);
+    } else if (this.currentScreen === 'feast_select') {
+      this.drawFeastSelect(ctx, spriteRenderer, viewportWidth, viewportHeight);
     } else if (this.currentScreen === 'assist_settings') {
       this.drawAssistSettings(ctx, player, viewportWidth, viewportHeight);
     } else if (this.currentScreen === 'pause') {
@@ -269,6 +272,96 @@ class MenuManager {
     ctx.fillStyle = '#ffe600';
     ctx.font = "9px 'Press Start 2P', monospace";
     ctx.fillText("★ TAP / PRESS ATTACK TO START STAGE ★", width / 2, height - 14);
+    ctx.textAlign = 'left';
+  }
+
+  // =========================================================================
+  // CHOPSTICK RAMEN FEAST COURSE SELECT
+  // =========================================================================
+  drawFeastSelect(ctx, spriteRenderer, width, height) {
+    ctx.fillStyle = '#0a011a';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffe600';
+    ctx.font = "11px 'Press Start 2P', monospace";
+    ctx.fillText("🥢 SELECT CHOPSTICK RAMEN FEAST 🍜", width / 2, 24);
+
+    const courses = [
+      {
+        id: 0,
+        name: "FEAST 1: SEOUL NIGHT MARKET BOWL",
+        broth: "Rich Tonkotsu Pork & Sesame Broth",
+        color: '#ff9900',
+        toppings: "Soft Egg • Narutomaki • Crisp Nori • Golden Dumpling",
+        spice: "★☆☆☆☆ (MILD & SWEET)"
+      },
+      {
+        id: 1,
+        name: "FEAST 2: CONCERT DOME GOLDEN EGG DELIGHT",
+        broth: "Silky Butter Corn & Golden Miso",
+        color: '#ffd700',
+        toppings: "Triple Golden Egg • Sweet Corn • Naruto • Star",
+        spice: "★★☆☆☆ (SAVORY DELIGHT)"
+      },
+      {
+        id: 2,
+        name: "FEAST 3: MYSTIC CHERRY SHIRNE RAINBOW BOWL",
+        broth: "Sparkling Rainbow Dragon Broth",
+        color: '#00f0ff',
+        toppings: "Rainbow Star • Cherry Blossom Broth • Dumpling",
+        spice: "★★★☆☆ (MAGICAL SPARKLE)"
+      },
+      {
+        id: 3,
+        name: "FEAST 4: OVERLORD SPICY VOLCANO FEAST",
+        broth: "Royal Fiery Habanero Chili Broth",
+        color: '#ff0055',
+        toppings: "Fire Chili • Demon Molten Egg • Gyoza • Star",
+        spice: "★★★★★ (VOLCANO SPICY!)"
+      }
+    ];
+
+    const course = courses[this.selectedFeastIndex];
+
+    const boxX = 35;
+    const boxY = 36;
+    const boxW = width - 70;
+    const boxH = 142;
+
+    ctx.fillStyle = 'rgba(24, 10, 42, 0.92)';
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.strokeStyle = course.color;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+    // Course Name Header
+    ctx.fillStyle = course.color;
+    ctx.font = "9px 'Press Start 2P', monospace";
+    ctx.fillText(course.name, width / 2, boxY + 22);
+
+    // Steaming Ramen Bowl Sprite
+    const bowlType = this.selectedFeastIndex === 0 ? 'normal' : (this.selectedFeastIndex === 1 ? 'spicy' : (this.selectedFeastIndex === 2 ? 'rainbow' : 'spicy'));
+    spriteRenderer.drawRamenBowl(ctx, width / 2 - 20, boxY + 34, bowlType, this.animTimer, 1.8);
+
+    // Recipe details
+    ctx.fillStyle = '#ffffff';
+    ctx.font = "7px 'Press Start 2P', monospace";
+    ctx.fillText(`BROTH: ${course.broth}`, width / 2, boxY + 84);
+
+    ctx.fillStyle = '#ffaa00';
+    ctx.fillText(`TOPPINGS: ${course.toppings}`, width / 2, boxY + 98);
+
+    ctx.fillStyle = '#ff007f';
+    ctx.fillText(`SPICE: ${course.spice}`, width / 2, boxY + 112);
+
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = "8px 'Press Start 2P', monospace";
+    ctx.fillText("◀ PREV COURSE (LEFT)   NEXT (RIGHT) ▶", width / 2, boxY + 130);
+
+    ctx.fillStyle = '#ffe600';
+    ctx.font = "9px 'Press Start 2P', monospace";
+    ctx.fillText("★ TAP / PRESS ATTACK TO START FEAST! ★", width / 2, height - 12);
     ctx.textAlign = 'left';
   }
 

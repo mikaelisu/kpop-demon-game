@@ -26,8 +26,9 @@ class GameApp {
     this.levelManager = new LevelManager();
     this.hud = new HUD();
     this.menus = new MenuManager();
-    this.album = new PhotocardAlbum();
+    this.album = new Album();
     this.ramenGame = new RamenMinigame();
+    this.chopstickFeast = new ChopstickFeastGame();
 
     // Global Game Audio & App Ref
     window.gameAudio = { synth: this.synth, sfx: this.sfx, music: this.music };
@@ -101,13 +102,14 @@ class GameApp {
       });
     }
 
-    // 5. Header Navigation Buttons (Game, Ramen Minigame, Photocard Album)
+    // 5. Header Navigation Buttons (Game, Chopsticks, Ramen Minigame, Photocard Album)
     const btnGame = document.getElementById('btn-nav-game');
+    const btnFeast = document.getElementById('btn-nav-feast');
     const btnMinigame = document.getElementById('btn-nav-minigame');
     const btnAlbum = document.getElementById('btn-nav-album');
 
     const updateNavActive = (activeBtn) => {
-      [btnGame, btnMinigame, btnAlbum].forEach(b => {
+      [btnGame, btnFeast, btnMinigame, btnAlbum].forEach(b => {
         if (b) b.classList.remove('active');
       });
       if (activeBtn) activeBtn.classList.add('active');
@@ -121,6 +123,15 @@ class GameApp {
           this.menus.currentScreen = 'character_select';
           if (this.music) this.music.playTrack('title');
         }
+      });
+    }
+
+    if (btnFeast) {
+      btnFeast.addEventListener('click', () => {
+        updateNavActive(btnFeast);
+        this.state = 'feast_select';
+        this.menus.currentScreen = 'feast_select';
+        if (this.music) this.music.playTrack('stage1');
       });
     }
 
@@ -144,6 +155,39 @@ class GameApp {
     // Canvas click / tap handler for menus
     this.canvas.addEventListener('click', (e) => {
       this.handleCanvasClick(e);
+    });
+
+    // Direct Touch / Drag Tracking for Chopstick Feast
+    const handlePointerMove = (e) => {
+      if (this.state === 'chopstick_feast' && this.chopstickFeast) {
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.virtualWidth / rect.width;
+        const scaleY = this.virtualHeight / rect.height;
+        const pointerX = (e.clientX - rect.left) * scaleX;
+        const pointerY = (e.clientY - rect.top) * scaleY;
+        this.chopstickFeast.setPointerPos(pointerX, pointerY, e.buttons > 0);
+      }
+    };
+
+    this.canvas.addEventListener('pointermove', handlePointerMove);
+    this.canvas.addEventListener('pointerdown', (e) => {
+      handlePointerMove(e);
+      if (this.state === 'chopstick_feast' && this.chopstickFeast) {
+        this.chopstickFeast.isPinched = true;
+        this.chopstickFeast.tryGrabFood(this.sfx, this.particles);
+      }
+    });
+    this.canvas.addEventListener('pointerup', () => {
+      if (this.state === 'chopstick_feast' && this.chopstickFeast) {
+        this.chopstickFeast.isPinched = false;
+        if (this.chopstickFeast.heldItem) {
+          if (this.chopstickFeast.chopstickY < 85) {
+            this.chopstickFeast.executeSlurp(this.sfx, this.particles, this.player);
+          } else {
+            this.chopstickFeast.heldItem = null;
+          }
+        }
+      }
     });
   }
 
@@ -240,6 +284,53 @@ class GameApp {
     }
 
     // =========================================================================
+    // STATE: CHOPSTICK RAMEN FEAST SELECT (STANDALONE LEVEL SELECTOR)
+    // =========================================================================
+    else if (this.state === 'feast_select') {
+      this.menus.update(dt);
+
+      if (this.input.justLeft()) {
+        this.menus.selectedFeastIndex = (this.menus.selectedFeastIndex - 1 + 4) % 4;
+        if (this.sfx) this.sfx.playJump();
+      } else if (this.input.justRight()) {
+        this.menus.selectedFeastIndex = (this.menus.selectedFeastIndex + 1) % 4;
+        if (this.sfx) this.sfx.playJump();
+      }
+
+      if (this.input.justAttack() || this.input.justJump() || this.input.justSlurp()) {
+        this.state = 'chopstick_feast';
+        this.chopstickFeast.startFeast(this.menus.selectedFeastIndex, this.player.charId, true, 1);
+        if (this.sfx) this.sfx.playStar();
+      }
+    }
+
+    // =========================================================================
+    // STATE: CHOPSTICK RAMEN FEAST LEVEL (INTERACTIVE SLURP GAMEPLAY)
+    // =========================================================================
+    else if (this.state === 'chopstick_feast') {
+      this.chopstickFeast.update(dt, this.input, this.sfx, this.particles, this.player);
+      this.particles.update(dt);
+
+      if (this.chopstickFeast.isCleared && this.chopstickFeast.clearTimer <= 0) {
+        if (this.chopstickFeast.isStandalone) {
+          this.state = 'feast_select';
+          this.menus.currentScreen = 'feast_select';
+        } else {
+          // Story Mode: in-between feast finished, proceed to next combat stage!
+          const nextStage = this.chopstickFeast.nextStageIndex;
+          if (nextStage < STAGES_DATA.length) {
+            this.startStage(nextStage);
+          } else {
+            // Game Win!
+            this.state = 'game_win';
+            this.menus.currentScreen = 'game_win';
+            if (this.music) this.music.playTrack('victory');
+          }
+        }
+      }
+    }
+
+    // =========================================================================
     // STATE: PLAYING
     // =========================================================================
     else if (this.state === 'playing') {
@@ -280,17 +371,11 @@ class GameApp {
         this.music
       );
 
-      // Check Stage Clear Transition
+      // Check Stage Clear Transition -> Transitions into Delicious In-Between Chopstick Feast!
       if (this.levelManager.isStageCleared && this.levelManager.clearTimer <= 0) {
-        const nextStage = this.levelManager.currentStageIndex + 1;
-        if (nextStage < STAGES_DATA.length) {
-          this.startStage(nextStage);
-        } else {
-          // Game Win!
-          this.state = 'game_win';
-          this.menus.currentScreen = 'game_win';
-          if (this.music) this.music.playTrack('victory');
-        }
+        this.state = 'chopstick_feast';
+        this.chopstickFeast.startFeast(this.levelManager.currentStageIndex, this.player.charId, false, this.levelManager.currentStageIndex + 1);
+        if (this.music) this.music.playTrack('stage1');
       }
 
       // Check Player Defeat (if Assist Mode Invincibility is OFF)
@@ -410,6 +495,20 @@ class GameApp {
       } else {
         this.startStage(this.menus.selectedStageIndex);
       }
+    } else if (this.state === 'feast_select') {
+      if (clickX < this.virtualWidth * 0.3) {
+        this.menus.selectedFeastIndex = (this.menus.selectedFeastIndex - 1 + 4) % 4;
+        if (this.sfx) this.sfx.playJump();
+      } else if (clickX > this.virtualWidth * 0.7) {
+        this.menus.selectedFeastIndex = (this.menus.selectedFeastIndex + 1) % 4;
+        if (this.sfx) this.sfx.playJump();
+      } else {
+        this.state = 'chopstick_feast';
+        this.chopstickFeast.startFeast(this.menus.selectedFeastIndex, this.player.charId, true, 1);
+        if (this.sfx) this.sfx.playStar();
+      }
+    } else if (this.state === 'chopstick_feast') {
+      this.chopstickFeast.setPointerPos(clickX, clickY, true);
     } else if (this.state === 'album') {
       if (clickX < this.virtualWidth * 0.3) {
         this.album.selectedCardIndex = (this.album.selectedCardIndex - 1 + this.album.cards.length) % this.album.cards.length;
@@ -479,13 +578,16 @@ class GameApp {
 
       // 6. HUD
       this.hud.draw(this.ctx, this.player, this.levelManager, this.spriteRenderer, this.virtualWidth, this.virtualHeight);
+    } else if (this.state === 'chopstick_feast') {
+      this.chopstickFeast.draw(this.ctx, this.spriteRenderer, this.virtualWidth, this.virtualHeight);
+      this.particles.draw(this.ctx, { x: 0, y: 0 });
     } else if (this.state === 'album') {
       this.album.draw(this.ctx, this.spriteRenderer, this.virtualWidth, this.virtualHeight);
     } else if (this.state === 'ramen_game') {
       this.ramenGame.draw(this.ctx, this.spriteRenderer, this.virtualWidth, this.virtualHeight);
       this.particles.draw(this.ctx, { x: 0, y: 0 });
     } else {
-      // Render Menus (Title, Character Select, Stage Select, Game Over, Win)
+      // Render Menus (Title, Character Select, Stage Select, Feast Select, Game Over, Win)
       this.menus.draw(this.ctx, this.spriteRenderer, this.player, this.virtualWidth, this.virtualHeight);
     }
 

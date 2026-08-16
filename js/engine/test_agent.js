@@ -96,6 +96,26 @@ class TestAgent {
     } else if (state === 'stage_select') {
       input.setInjectedInput('attack', true);
       return;
+    } else if (state === 'feast_select') {
+      input.setInjectedInput('attack', true);
+      return;
+    } else if (state === 'chopstick_feast') {
+      if (this.game.chopstickFeast) {
+        const feast = this.game.chopstickFeast;
+        if (feast.isCleared) {
+          input.setInjectedInput('attack', true);
+          input.setInjectedInput('jump', true);
+        } else {
+          const unEaten = feast.foodItems.find(f => !f.eaten);
+          if (unEaten) {
+            feast.setPointerPos(unEaten.x, unEaten.y, true);
+            feast.tryGrabFood(this.game.sfx, this.game.particles);
+            feast.chopstickY = 50;
+            feast.executeSlurp(this.game.sfx, this.game.particles, this.game.player);
+          }
+        }
+      }
+      return;
     } else if (state === 'game_over' || state === 'game_win') {
       input.setInjectedInput('attack', true);
       input.setInjectedInput('jump', true);
@@ -540,6 +560,23 @@ class TestAgent {
       assert('Input System', 'Test Agent can inject simulated inputs', input.isJump() === true);
       input.clearInjectedInputs();
       assert('Input System', 'Injected inputs cleared', input.isJump() === false);
+
+      // -----------------------------------------------------------------------
+      // SUITE 9: Chopstick Ramen Feast Interactive Engine & Courses
+      // -----------------------------------------------------------------------
+      const feastGame = new ChopstickFeastGame();
+      assert('Chopstick Feast', 'ChopstickFeastGame instantiation', feastGame instanceof ChopstickFeastGame);
+      assert('Chopstick Feast', 'Defines 4 unique gourmet feast courses', feastGame.courses.length === 4);
+      feastGame.startFeast(0, 'rumi', false, 1);
+      assert('Chopstick Feast', 'Feast starts active with populated bowl items', feastGame.isActive && feastGame.foodItems.length >= 10);
+      const testFood = feastGame.foodItems[0];
+      feastGame.chopstickX = testFood.x;
+      feastGame.chopstickY = testFood.y;
+      feastGame.tryGrabFood(mockSFX, mockParticles);
+      assert('Chopstick Feast', 'Golden chopsticks grab food items within range', feastGame.heldItem === testFood);
+      feastGame.chopstickY = 50;
+      feastGame.executeSlurp(mockSFX, mockParticles, pLuna);
+      assert('Chopstick Feast', 'Idol slurps food item and increments yummy counter', feastGame.slurpCount === 1 && testFood.eaten);
 
     } catch (err) {
       assert('Execution Integrity', 'Uncaught test execution exception', false, err.message);
