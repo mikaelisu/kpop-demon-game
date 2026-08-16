@@ -1,0 +1,778 @@
+/**
+ * K-POP DEMON HUNTERS - 8-Bit Pixel Sprite Engine
+ * Procedural retro sprite renderer for idols, demons, bosses, ramen, and tiles.
+ */
+
+class SpriteRenderer {
+  constructor() {
+    this.cache = new Map();
+  }
+
+  /**
+   * Draw a pixel-art grid from a string matrix
+   */
+  drawPixelMatrix(ctx, matrix, colorMap, x, y, scale = 1, flipX = false) {
+    const rows = matrix.length;
+    const cols = matrix[0].length;
+
+    ctx.save();
+    if (flipX) {
+      ctx.translate(x + cols * scale, y);
+      ctx.scale(-1, 1);
+    } else {
+      ctx.translate(x, y);
+    }
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const char = matrix[r][c];
+        if (char && char !== '.' && char !== ' ' && colorMap[char]) {
+          ctx.fillStyle = colorMap[char];
+          ctx.fillRect(c * scale, r * scale, scale, scale);
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  // =========================================================================
+  // RAMEN & COLLECTIBLE SPRITES
+  // =========================================================================
+
+  drawRamenBowl(ctx, x, y, type = 'normal', animTimer = 0, scale = 2) {
+    // 16x16 Pixel Ramen Bowl
+    const bowlColor = type === 'spicy' ? '#d90429' : (type === 'rainbow' ? '#ffd700' : '#d22d2d');
+    const brothColor = type === 'spicy' ? '#ff3b00' : (type === 'rainbow' ? '#ff007f' : '#e69926');
+    const noodleColor = type === 'rainbow' ? '#ffffff' : '#fff0a3';
+
+    // Bowl shape
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Steam animation
+    const steamOffset = Math.sin(animTimer * 5) * 2;
+    ctx.fillStyle = type === 'rainbow' ? '#00f0ff' : 'rgba(255, 255, 255, 0.75)';
+    ctx.fillRect((5 + steamOffset) * scale, 0 * scale, 2 * scale, 2 * scale);
+    ctx.fillRect((9 - steamOffset) * scale, 1 * scale, 2 * scale, 2 * scale);
+    ctx.fillRect((6 - steamOffset) * scale, 3 * scale, 2 * scale, 2 * scale);
+    ctx.fillRect((10 + steamOffset) * scale, 4 * scale, 2 * scale, 2 * scale);
+
+    // Chopsticks resting
+    ctx.fillStyle = '#ffd700';
+    ctx.fillRect(2 * scale, 5 * scale, 12 * scale, 1 * scale);
+    ctx.fillStyle = '#8b5a2b';
+    ctx.fillRect(2 * scale, 6 * scale, 12 * scale, 1 * scale);
+
+    // Broth surface
+    ctx.fillStyle = brothColor;
+    ctx.fillRect(2 * scale, 7 * scale, 12 * scale, 3 * scale);
+
+    // Delicious curly noodles
+    ctx.fillStyle = noodleColor;
+    ctx.fillRect(3 * scale, 7 * scale, 2 * scale, 2 * scale);
+    ctx.fillRect(6 * scale, 8 * scale, 3 * scale, 1 * scale);
+    ctx.fillRect(10 * scale, 7 * scale, 2 * scale, 2 * scale);
+
+    // Naruto Fishcake (Pink Swirl)
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(4 * scale, 8 * scale, 4 * scale, 3 * scale);
+    ctx.fillStyle = '#ff1493';
+    ctx.fillRect(5 * scale, 9 * scale, 2 * scale, 1 * scale);
+
+    // Soft Boiled Egg Half
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(9 * scale, 8 * scale, 4 * scale, 3 * scale);
+    ctx.fillStyle = '#ff9900';
+    ctx.fillRect(10 * scale, 9 * scale, 2 * scale, 1 * scale);
+
+    // Nori Seaweed Sheet
+    ctx.fillStyle = '#1c2b18';
+    ctx.fillRect(12 * scale, 5 * scale, 2 * scale, 5 * scale);
+
+    // Ceramic Bowl Exterior
+    ctx.fillStyle = bowlColor;
+    ctx.fillRect(1 * scale, 10 * scale, 14 * scale, 4 * scale);
+    ctx.fillRect(3 * scale, 14 * scale, 10 * scale, 2 * scale);
+    ctx.fillRect(5 * scale, 16 * scale, 6 * scale, 1 * scale);
+
+    // Golden Bowl Rim Pattern
+    ctx.fillStyle = '#ffe600';
+    ctx.fillRect(1 * scale, 10 * scale, 14 * scale, 1 * scale);
+    ctx.fillRect(3 * scale, 12 * scale, 10 * scale, 1 * scale);
+
+    // Rainbow Fever Sparkles
+    if (type === 'rainbow') {
+      const glow = Math.abs(Math.sin(animTimer * 8));
+      ctx.strokeStyle = `rgba(255, 230, 0, ${glow})`;
+      ctx.lineWidth = scale;
+      ctx.strokeRect(-2 * scale, -2 * scale, 20 * scale, 21 * scale);
+    } else if (type === 'spicy') {
+      // Mini flame sparks
+      ctx.fillStyle = '#ff4400';
+      ctx.fillRect((2 + Math.sin(animTimer * 10) * 2) * scale, 2 * scale, 2 * scale, 2 * scale);
+    }
+
+    ctx.restore();
+  }
+
+  drawStar(ctx, x, y, animTimer = 0, scale = 2) {
+    ctx.save();
+    ctx.translate(x, y);
+    const pulse = 1 + Math.sin(animTimer * 6) * 0.15;
+    ctx.scale(pulse, pulse);
+
+    ctx.fillStyle = '#ffe600';
+    // 8-bit star
+    ctx.fillRect(3 * scale, 0 * scale, 2 * scale, 2 * scale);
+    ctx.fillRect(2 * scale, 2 * scale, 4 * scale, 2 * scale);
+    ctx.fillRect(0 * scale, 3 * scale, 8 * scale, 2 * scale);
+    ctx.fillRect(1 * scale, 5 * scale, 6 * scale, 2 * scale);
+    ctx.fillRect(2 * scale, 7 * scale, 2 * scale, 2 * scale);
+    ctx.fillRect(4 * scale, 7 * scale, 2 * scale, 2 * scale);
+
+    // Center sparkle
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(3 * scale, 3 * scale, 2 * scale, 2 * scale);
+    ctx.restore();
+  }
+
+  drawGoldenChopsticks(ctx, x, y, animTimer = 0, scale = 2) {
+    ctx.save();
+    ctx.translate(x, y);
+    const bob = Math.sin(animTimer * 4) * 2;
+    ctx.translate(0, bob);
+
+    // Glowing Chopsticks
+    ctx.fillStyle = '#ffe600';
+    ctx.fillRect(1 * scale, 1 * scale, 2 * scale, 14 * scale);
+    ctx.fillRect(5 * scale, 0 * scale, 2 * scale, 15 * scale);
+    
+    // Ribbon wrap
+    ctx.fillStyle = '#ff1493';
+    ctx.fillRect(0 * scale, 8 * scale, 8 * scale, 2 * scale);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(3 * scale, 7 * scale, 2 * scale, 4 * scale);
+
+    ctx.restore();
+  }
+
+  drawHeart(ctx, x, y, full = true, scale = 2) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (full) {
+      ctx.fillStyle = '#ff0055';
+      ctx.fillRect(1 * scale, 0 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(4 * scale, 0 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(0 * scale, 1 * scale, 7 * scale, 3 * scale);
+      ctx.fillRect(1 * scale, 4 * scale, 5 * scale, 2 * scale);
+      ctx.fillRect(2 * scale, 6 * scale, 3 * scale, 1 * scale);
+      ctx.fillRect(3 * scale, 7 * scale, 1 * scale, 1 * scale);
+      // Shine
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(1 * scale, 1 * scale, 1 * scale, 1 * scale);
+    } else {
+      ctx.fillStyle = '#442233';
+      ctx.fillRect(1 * scale, 0 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(4 * scale, 0 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(0 * scale, 1 * scale, 7 * scale, 3 * scale);
+      ctx.fillRect(1 * scale, 4 * scale, 5 * scale, 2 * scale);
+      ctx.fillRect(2 * scale, 6 * scale, 3 * scale, 1 * scale);
+      ctx.fillRect(3 * scale, 7 * scale, 1 * scale, 1 * scale);
+    }
+    ctx.restore();
+  }
+
+  // =========================================================================
+  // K-POP IDOL DEMON HUNTERS
+  // =========================================================================
+
+  drawPlayer(ctx, player, scale = 2) {
+    const { x, y, charId, state, facingRight, animTimer, combo, spicyMode, rainbowFever, invincibleTimer } = player;
+
+    // Blink when taking damage
+    if (invincibleTimer > 0 && Math.floor(invincibleTimer * 15) % 2 === 0 && !rainbowFever) {
+      return;
+    }
+
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+
+    if (!facingRight) {
+      ctx.scale(-1, 1);
+      ctx.translate(-24 * scale, 0);
+    }
+
+    // Color definitions per Idol
+    let hairColor = '#ff77bb';
+    let outfitColor1 = '#ffffff';
+    let outfitColor2 = '#00f0ff';
+    let swordColor = '#00f0ff';
+    let skinColor = '#ffe0bd';
+
+    if (charId === 'minho') {
+      hairColor = '#3a2618';
+      outfitColor1 = '#ff4400';
+      outfitColor2 = '#222222';
+      swordColor = '#ffaa00';
+    } else if (charId === 'hana') {
+      hairColor = '#ffe600';
+      outfitColor1 = '#ff007f';
+      outfitColor2 = '#ffffff';
+      swordColor = '#ff1493';
+    } else if (charId === 'felix') {
+      hairColor = '#88ddff';
+      outfitColor1 = '#9900ff';
+      outfitColor2 = '#111122';
+      swordColor = '#cc00ff';
+    }
+
+    if (spicyMode) swordColor = '#ff3300';
+    if (rainbowFever) {
+      const hues = ['#ff0055', '#ff9900', '#ffee00', '#00ff66', '#00f0ff', '#cc00ff'];
+      swordColor = hues[Math.floor(animTimer * 12) % hues.length];
+      
+      // Rainbow aura pulse
+      ctx.fillStyle = swordColor;
+      ctx.globalAlpha = 0.35;
+      ctx.fillRect(2 * scale, 0, 20 * scale, 24 * scale);
+      ctx.globalAlpha = 1.0;
+    }
+
+    // Determine posture / frame
+    const runFrame = Math.floor(animTimer * 10) % 4;
+    const isAttacking = state === 'attack';
+    const isJumping = state === 'jump' || state === 'fall';
+    const isWallClinging = state === 'wall_cling';
+    const isSlurping = state === 'slurp';
+
+    // Base coordinates
+    let headY = 4;
+    let bodyY = 10;
+    let legOffset = 0;
+
+    if (state === 'run') {
+      headY = 4 + (runFrame % 2 === 0 ? 0 : 1);
+      legOffset = (runFrame === 1) ? 2 : (runFrame === 3 ? -2 : 0);
+    } else if (isJumping) {
+      headY = 3;
+      bodyY = 9;
+    } else if (isWallClinging) {
+      headY = 4;
+    }
+
+    // 1. Hair & Head Accessory
+    ctx.fillStyle = hairColor;
+    // Hair buns / idol hair style
+    if (charId === 'luna') {
+      // Double anime buns
+      ctx.fillRect(6 * scale, (headY - 3) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(15 * scale, (headY - 3) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(7 * scale, headY * scale, 10 * scale, 6 * scale);
+    } else if (charId === 'minho') {
+      // Cool spiked idol hair
+      ctx.fillRect(7 * scale, (headY - 2) * scale, 10 * scale, 6 * scale);
+      ctx.fillRect(5 * scale, (headY - 1) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(16 * scale, (headY - 1) * scale, 3 * scale, 3 * scale);
+    } else if (charId === 'hana') {
+      // Twin high ponytails with star clips
+      ctx.fillRect(5 * scale, (headY - 3) * scale, 3 * scale, 5 * scale);
+      ctx.fillRect(16 * scale, (headY - 3) * scale, 3 * scale, 5 * scale);
+      ctx.fillRect(7 * scale, headY * scale, 10 * scale, 6 * scale);
+      // Star clip
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(6 * scale, (headY - 1) * scale, 2 * scale, 2 * scale);
+      ctx.fillStyle = hairColor;
+    } else {
+      // Felix side-swept waves
+      ctx.fillRect(7 * scale, (headY - 2) * scale, 11 * scale, 6 * scale);
+      ctx.fillRect(16 * scale, headY * scale, 3 * scale, 4 * scale);
+    }
+
+    // 2. Face & Eyes
+    ctx.fillStyle = skinColor;
+    ctx.fillRect(8 * scale, (headY + 2) * scale, 8 * scale, 5 * scale);
+
+    // Cute Anime Eyes
+    ctx.fillStyle = '#110022';
+    ctx.fillRect(11 * scale, (headY + 3) * scale, 2 * scale, 2 * scale);
+    ctx.fillRect(14 * scale, (headY + 3) * scale, 2 * scale, 2 * scale);
+    // Eye sparkle
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(11 * scale, (headY + 3) * scale, 1 * scale, 1 * scale);
+    ctx.fillRect(14 * scale, (headY + 3) * scale, 1 * scale, 1 * scale);
+    // Blush
+    ctx.fillStyle = '#ff77aa';
+    ctx.fillRect(9 * scale, (headY + 5) * scale, 2 * scale, 1 * scale);
+    ctx.fillRect(15 * scale, (headY + 5) * scale, 2 * scale, 1 * scale);
+
+    // 3. Stage Outfit (Jacket & Shirt)
+    ctx.fillStyle = outfitColor1;
+    ctx.fillRect(8 * scale, (bodyY) * scale, 8 * scale, 6 * scale);
+    // Inner stylish trim / neon stripes
+    ctx.fillStyle = outfitColor2;
+    ctx.fillRect(10 * scale, (bodyY + 1) * scale, 4 * scale, 5 * scale);
+    ctx.fillRect(8 * scale, (bodyY + 5) * scale, 8 * scale, 1 * scale); // Belt
+
+    // 4. Legs / Boots
+    ctx.fillStyle = '#1a0033';
+    if (isJumping) {
+      // Tucked ninja legs
+      ctx.fillRect(8 * scale, 16 * scale, 3 * scale, 4 * scale);
+      ctx.fillRect(12 * scale, 15 * scale, 4 * scale, 4 * scale);
+    } else if (isWallClinging) {
+      ctx.fillRect(6 * scale, 16 * scale, 4 * scale, 4 * scale);
+      ctx.fillRect(10 * scale, 17 * scale, 4 * scale, 4 * scale);
+    } else {
+      ctx.fillRect((8 - legOffset) * scale, 16 * scale, 3 * scale, 6 * scale);
+      ctx.fillRect((13 + legOffset) * scale, 16 * scale, 3 * scale, 6 * scale);
+      // Neon sneakers
+      ctx.fillStyle = swordColor;
+      ctx.fillRect((7 - legOffset) * scale, 21 * scale, 4 * scale, 2 * scale);
+      ctx.fillRect((12 + legOffset) * scale, 21 * scale, 4 * scale, 2 * scale);
+    }
+
+    // 5. GLOWING SWORD / ATTACK SPRITE
+    if (isAttacking) {
+      this.drawGlowingSwordSlash(ctx, combo, swordColor, scale);
+    } else if (isSlurping) {
+      // Slurping bowl animation
+      this.drawRamenBowl(ctx, 10 * scale, 8 * scale, spicyMode ? 'spicy' : (rainbowFever ? 'rainbow' : 'normal'), animTimer, scale * 0.7);
+    } else {
+      // Idle / running glowing sword resting on back or in hand
+      ctx.save();
+      // Glow sheath
+      ctx.fillStyle = swordColor;
+      ctx.shadowColor = swordColor;
+      ctx.shadowBlur = 8;
+      ctx.fillRect(4 * scale, 6 * scale, 2 * scale, 14 * scale);
+      // Sword Hilt / Guard
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(3 * scale, 5 * scale, 4 * scale, 2 * scale);
+      ctx.fillRect(4 * scale, 3 * scale, 2 * scale, 3 * scale); // Handle
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  drawGlowingSwordSlash(ctx, comboIndex, color, scale) {
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 12;
+
+    // Glowing Neon Blade in front
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3 * scale;
+
+    if (comboIndex === 1) {
+      // Horizontal forward high-speed slash
+      ctx.beginPath();
+      ctx.arc(14 * scale, 12 * scale, 14 * scale, -Math.PI / 4, Math.PI / 4);
+      ctx.stroke();
+
+      // Energy Slash Blade
+      ctx.fillStyle = color;
+      ctx.fillRect(16 * scale, 10 * scale, 16 * scale, 4 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(17 * scale, 11 * scale, 14 * scale, 2 * scale);
+    } else if (comboIndex === 2) {
+      // Upward Crescent Rising Slash
+      ctx.beginPath();
+      ctx.arc(14 * scale, 12 * scale, 16 * scale, -Math.PI / 2, 0.2);
+      ctx.stroke();
+
+      ctx.fillStyle = color;
+      ctx.fillRect(14 * scale, 2 * scale, 6 * scale, 18 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(15 * scale, 4 * scale, 4 * scale, 14 * scale);
+    } else {
+      // Combo 3: 360 Full Cyclone K-Pop Sword Spin
+      ctx.beginPath();
+      ctx.arc(12 * scale, 12 * scale, 18 * scale, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 10 * scale, 26 * scale, 4 * scale);
+      ctx.fillRect(10 * scale, 0, 4 * scale, 26 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(2 * scale, 11 * scale, 22 * scale, 2 * scale);
+    }
+
+    // Sparkles on sword tip
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(28 * scale, 8 * scale, 2 * scale, 2 * scale);
+    ctx.fillRect(26 * scale, 14 * scale, 2 * scale, 2 * scale);
+    ctx.restore();
+  }
+
+  // =========================================================================
+  // DEMON ENEMIES
+  // =========================================================================
+
+  drawEnemy(ctx, enemy, scale = 2) {
+    const { x, y, type, facingRight, animTimer, isHit } = enemy;
+
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+
+    if (!facingRight) {
+      ctx.scale(-1, 1);
+      ctx.translate(-20 * scale, 0);
+    }
+
+    if (isHit) {
+      // Flash white when hit
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 20 * scale, 20 * scale);
+      ctx.restore();
+      return;
+    }
+
+    if (type === 'imp') {
+      // Spicy Pepper Imp (Red horned chili demon)
+      const hop = Math.abs(Math.sin(animTimer * 8)) * 3;
+      ctx.translate(0, -hop * scale);
+
+      // Body (Chili pear shape)
+      ctx.fillStyle = '#e63946';
+      ctx.fillRect(4 * scale, 6 * scale, 12 * scale, 10 * scale);
+      ctx.fillRect(6 * scale, 3 * scale, 8 * scale, 4 * scale);
+      ctx.fillRect(6 * scale, 16 * scale, 8 * scale, 2 * scale);
+
+      // Horns
+      ctx.fillStyle = '#ffe600';
+      ctx.fillRect(4 * scale, 1 * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(13 * scale, 1 * scale, 3 * scale, 3 * scale);
+
+      // Big mischievous eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(6 * scale, 7 * scale, 3 * scale, 4 * scale);
+      ctx.fillRect(11 * scale, 7 * scale, 3 * scale, 4 * scale);
+      ctx.fillStyle = '#110022';
+      ctx.fillRect(7 * scale, 8 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(12 * scale, 8 * scale, 2 * scale, 2 * scale);
+
+      // Cute demon fangs
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(8 * scale, 12 * scale, 1 * scale, 2 * scale);
+      ctx.fillRect(11 * scale, 12 * scale, 1 * scale, 2 * scale);
+
+      // Feet
+      ctx.fillStyle = '#7a0010';
+      ctx.fillRect(4 * scale, 18 * scale, 4 * scale, 2 * scale);
+      ctx.fillRect(12 * scale, 18 * scale, 4 * scale, 2 * scale);
+
+    } else if (type === 'ghoul') {
+      // Ghostly Fan Ghoul (Floating lightstick ghost)
+      const floatY = Math.sin(animTimer * 4) * 3;
+      ctx.translate(0, floatY * scale);
+
+      // Ethereal glowing sheet
+      ctx.fillStyle = '#90e0ef';
+      ctx.fillRect(4 * scale, 4 * scale, 12 * scale, 12 * scale);
+      ctx.fillRect(2 * scale, 6 * scale, 16 * scale, 8 * scale);
+      // Ghost tail ripples
+      const tailWobble = Math.sin(animTimer * 10) > 0 ? 0 : 2;
+      ctx.fillRect((3 + tailWobble) * scale, 16 * scale, 3 * scale, 3 * scale);
+      ctx.fillRect((8 - tailWobble) * scale, 16 * scale, 4 * scale, 3 * scale);
+      ctx.fillRect((14 + tailWobble) * scale, 16 * scale, 3 * scale, 3 * scale);
+
+      // Glowing Eyes
+      ctx.fillStyle = '#ff007f';
+      ctx.fillRect(6 * scale, 7 * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(12 * scale, 7 * scale, 3 * scale, 3 * scale);
+
+      // Holding a glowing mini fan lightstick
+      ctx.fillStyle = '#ff1493';
+      ctx.fillRect(16 * scale, 8 * scale, 3 * scale, 3 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(17 * scale, 11 * scale, 1 * scale, 4 * scale);
+
+    } else if (type === 'dokkaebi') {
+      // Dokkaebi Goblin (Green skinned, spiked club, tiger cloth)
+      const walk = Math.floor(animTimer * 6) % 2;
+
+      // Green body
+      ctx.fillStyle = '#38b000';
+      ctx.fillRect(4 * scale, 4 * scale, 12 * scale, 12 * scale);
+      // Single Gold Horn
+      ctx.fillStyle = '#ffe600';
+      ctx.fillRect(9 * scale, 1 * scale, 3 * scale, 4 * scale);
+
+      // Eyes & Teeth
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(6 * scale, 6 * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(11 * scale, 6 * scale, 3 * scale, 3 * scale);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(7 * scale, 7 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(12 * scale, 7 * scale, 2 * scale, 2 * scale);
+
+      // Upward Goblin Fangs
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(7 * scale, 10 * scale, 2 * scale, 3 * scale);
+      ctx.fillRect(11 * scale, 10 * scale, 2 * scale, 3 * scale);
+
+      // Tiger stripe pants
+      ctx.fillStyle = '#ffaa00';
+      ctx.fillRect(4 * scale, 14 * scale, 12 * scale, 4 * scale);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(6 * scale, 15 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(12 * scale, 15 * scale, 2 * scale, 2 * scale);
+
+      // Feet
+      ctx.fillStyle = '#227200';
+      ctx.fillRect((4 + walk * 2) * scale, 18 * scale, 4 * scale, 2 * scale);
+      ctx.fillRect((12 - walk * 2) * scale, 18 * scale, 4 * scale, 2 * scale);
+
+      // Spiked Club
+      ctx.fillStyle = '#8b5a2b';
+      ctx.fillRect(16 * scale, 6 * scale, 3 * scale, 10 * scale);
+      ctx.fillStyle = '#c0c0c0';
+      ctx.fillRect(18 * scale, 4 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(19 * scale, 8 * scale, 2 * scale, 2 * scale);
+
+    } else if (type === 'bat') {
+      // Noodle Bat (Purple cute swooping bat)
+      const flap = Math.sin(animTimer * 12) > 0 ? 0 : 4;
+
+      ctx.fillStyle = '#7209b7';
+      // Head/body
+      ctx.fillRect(7 * scale, 6 * scale, 6 * scale, 7 * scale);
+      // Ears
+      ctx.fillRect(6 * scale, 3 * scale, 2 * scale, 3 * scale);
+      ctx.fillRect(12 * scale, 3 * scale, 2 * scale, 3 * scale);
+
+      // Animated Wings
+      ctx.fillStyle = '#b5179e';
+      ctx.fillRect(1 * scale, (5 + flap) * scale, 6 * scale, 4 * scale);
+      ctx.fillRect(13 * scale, (5 + flap) * scale, 6 * scale, 4 * scale);
+
+      // Eyes
+      ctx.fillStyle = '#ffe600';
+      ctx.fillRect(8 * scale, 8 * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(11 * scale, 8 * scale, 2 * scale, 2 * scale);
+
+    } else {
+      // Dumpling Fiend (Squishy bouncing monster)
+      const squish = Math.sin(animTimer * 8);
+      ctx.fillStyle = '#f8f9fa';
+      ctx.fillRect(3 * scale, (6 + squish) * scale, 14 * scale, 10 * scale);
+      ctx.fillRect(5 * scale, (4 + squish) * scale, 10 * scale, 3 * scale);
+      // Eyes
+      ctx.fillStyle = '#110022';
+      ctx.fillRect(6 * scale, (8 + squish) * scale, 2 * scale, 2 * scale);
+      ctx.fillRect(12 * scale, (8 + squish) * scale, 2 * scale, 2 * scale);
+      // Blush
+      ctx.fillStyle = '#ff77aa';
+      ctx.fillRect(5 * scale, (11 + squish) * scale, 2 * scale, 1 * scale);
+      ctx.fillRect(13 * scale, (11 + squish) * scale, 2 * scale, 1 * scale);
+    }
+
+    ctx.restore();
+  }
+
+  // =========================================================================
+  // BOSS MONSTERS
+  // =========================================================================
+
+  drawBoss(ctx, boss, scale = 2) {
+    const { x, y, type, facingRight, animTimer, isHit, hp, maxHp, attackState } = boss;
+
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+
+    if (!facingRight) {
+      ctx.scale(-1, 1);
+      ctx.translate(-40 * scale, 0);
+    }
+
+    if (isHit && Math.floor(animTimer * 20) % 2 === 0) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 40 * scale, 40 * scale);
+      ctx.restore();
+      return;
+    }
+
+    if (type === 'dj_dokkaebi') {
+      // BOSS 1: DJ Dokkaebi (Cyan goblin wearing giant gold headphones & boombox)
+      const bop = Math.abs(Math.sin(animTimer * 10)) * 4;
+
+      // Turntable DJ Booth in front
+      ctx.fillStyle = '#140026';
+      ctx.fillRect(4 * scale, 26 * scale, 32 * scale, 14 * scale);
+      // Vinyl record glow
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(7 * scale, 28 * scale, 8 * scale, 3 * scale);
+      ctx.fillStyle = '#ff007f';
+      ctx.fillRect(25 * scale, 28 * scale, 8 * scale, 3 * scale);
+
+      // DJ Body
+      ctx.fillStyle = '#2a9d8f';
+      ctx.fillRect(10 * scale, (10 - bop) * scale, 20 * scale, 18 * scale);
+
+      // Giant Golden DJ Headphones
+      ctx.fillStyle = '#ffd700';
+      ctx.fillRect(6 * scale, (8 - bop) * scale, 6 * scale, 10 * scale); // Left cup
+      ctx.fillRect(28 * scale, (8 - bop) * scale, 6 * scale, 10 * scale); // Right cup
+      ctx.fillRect(9 * scale, (4 - bop) * scale, 22 * scale, 4 * scale); // Headband
+
+      // Cool Sunglasses
+      ctx.fillStyle = '#110022';
+      ctx.fillRect(13 * scale, (12 - bop) * scale, 14 * scale, 5 * scale);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(14 * scale, (13 - bop) * scale, 5 * scale, 2 * scale);
+      ctx.fillRect(21 * scale, (13 - bop) * scale, 5 * scale, 2 * scale);
+
+      // Big Grin
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(15 * scale, (19 - bop) * scale, 10 * scale, 3 * scale);
+      ctx.fillStyle = '#ffd700';
+      ctx.fillRect(18 * scale, (19 - bop) * scale, 2 * scale, 3 * scale); // Gold tooth
+
+    } else if (type === 'ramen_fiend') {
+      // BOSS 2: Giant Ramen Fiend (Living spicy noodle beast)
+      const wobble = Math.sin(animTimer * 6) * 3;
+
+      // Boiling Broth Body
+      ctx.fillStyle = '#e76f51';
+      ctx.fillRect(6 * scale, (8 + wobble) * scale, 28 * scale, 26 * scale);
+      ctx.fillRect(3 * scale, (14 + wobble) * scale, 34 * scale, 18 * scale);
+
+      // Noodle Tentacles
+      ctx.fillStyle = '#fff0a3';
+      for (let i = 0; i < 5; i++) {
+        const tx = 6 + i * 6 + Math.sin(animTimer * 8 + i) * 3;
+        ctx.fillRect(tx * scale, (2 + wobble) * scale, 3 * scale, 10 * scale);
+      }
+
+      // Naruto Fishcake Eyes (Spinning)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(10 * scale, (12 + wobble) * scale, 8 * scale, 8 * scale);
+      ctx.fillRect(22 * scale, (12 + wobble) * scale, 8 * scale, 8 * scale);
+      ctx.fillStyle = '#ff1493';
+      ctx.fillRect(13 * scale, (15 + wobble) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(25 * scale, (15 + wobble) * scale, 3 * scale, 3 * scale);
+
+      // Giant mouth full of steaming soup
+      ctx.fillStyle = '#ff3300';
+      ctx.fillRect(12 * scale, (23 + wobble) * scale, 16 * scale, 6 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(14 * scale, (23 + wobble) * scale, 3 * scale, 2 * scale);
+      ctx.fillRect(23 * scale, (23 + wobble) * scale, 3 * scale, 2 * scale);
+
+    } else {
+      // BOSS 3: Shadow Idol Demon King (Lord Neon)
+      const hover = Math.sin(animTimer * 5) * 4;
+
+      // Cyber Demon Wings (Neon Purple & Cyan)
+      ctx.fillStyle = '#480ca8';
+      ctx.fillRect(0, (4 + hover) * scale, 12 * scale, 20 * scale);
+      ctx.fillRect(28 * scale, (4 + hover) * scale, 12 * scale, 20 * scale);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(2 * scale, (6 + hover) * scale, 8 * scale, 3 * scale);
+      ctx.fillRect(30 * scale, (6 + hover) * scale, 8 * scale, 3 * scale);
+
+      // Stylish Dark Idol Trenchcoat
+      ctx.fillStyle = '#10002b';
+      ctx.fillRect(12 * scale, (8 + hover) * scale, 16 * scale, 28 * scale);
+      // Demon Fox Mask
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(13 * scale, (2 + hover) * scale, 14 * scale, 10 * scale);
+      ctx.fillStyle = '#ff0055';
+      ctx.fillRect(15 * scale, (5 + hover) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(22 * scale, (5 + hover) * scale, 3 * scale, 3 * scale);
+      ctx.fillRect(18 * scale, (8 + hover) * scale, 4 * scale, 2 * scale);
+
+      // Twin Glowing Dark Saber Lightsticks
+      ctx.fillStyle = '#ff007f';
+      ctx.shadowColor = '#ff007f';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(4 * scale, (14 + hover) * scale, 3 * scale, 22 * scale);
+      ctx.fillRect(33 * scale, (14 + hover) * scale, 3 * scale, 22 * scale);
+    }
+
+    ctx.restore();
+  }
+
+  // =========================================================================
+  // TILESET & ENVIRONMENT RENDERING
+  // =========================================================================
+
+  drawTile(ctx, tileType, x, y, stageType = 'market', scale = 2) {
+    const size = 16 * scale;
+
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+
+    if (tileType === 1) {
+      // Solid Ground / Platform Tile
+      if (stageType === 'market') {
+        // Neon Seoul Street Pavement
+        ctx.fillStyle = '#1b122c';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#3a2456';
+        ctx.fillRect(0, 0, size, 2 * scale);
+        ctx.fillRect(0, 2 * scale, 2 * scale, size - 2 * scale);
+        // Neon sidewalk curb glow
+        ctx.fillStyle = '#00f0ff';
+        ctx.fillRect(0, 0, size, 1 * scale);
+      } else if (stageType === 'concert') {
+        // Concert Stage Metal Truss & Speaker Grate
+        ctx.fillStyle = '#11111e';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#ff007f';
+        ctx.fillRect(0, 0, size, 2 * scale);
+        // Metal grating
+        ctx.fillStyle = '#33334d';
+        ctx.fillRect(4 * scale, 4 * scale, 8 * scale, 8 * scale);
+      } else if (stageType === 'temple') {
+        // Mystic Noodle Shrine Wood & Jade
+        ctx.fillStyle = '#4a2511';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#2d6a4f';
+        ctx.fillRect(0, 0, size, 3 * scale);
+        ctx.fillStyle = '#74c69d';
+        ctx.fillRect(0, 0, size, 1 * scale);
+      } else {
+        // Demon Castle Dark Cyber Stone
+        ctx.fillStyle = '#160029';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#7b2cbf';
+        ctx.fillRect(0, 0, size, 2 * scale);
+        ctx.fillStyle = '#9d4edd';
+        ctx.fillRect(2 * scale, 2 * scale, 4 * scale, 4 * scale);
+      }
+    } else if (tileType === 2) {
+      // One-Way Jump-Through Platform
+      ctx.fillStyle = '#ffb703';
+      ctx.fillRect(0, 0, size, 3 * scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, 1 * scale);
+      // Support struts
+      ctx.fillStyle = '#8b5a2b';
+      ctx.fillRect(2 * scale, 3 * scale, 2 * scale, 3 * scale);
+      ctx.fillRect(12 * scale, 3 * scale, 2 * scale, 3 * scale);
+    } else if (tileType === 3) {
+      // Bouncy Ramen Spring Pad (Kid-Friendly launch pad)
+      ctx.fillStyle = '#d22d2d';
+      ctx.fillRect(2 * scale, 8 * scale, 12 * scale, 6 * scale);
+      ctx.fillStyle = '#fff0a3';
+      ctx.fillRect(3 * scale, 5 * scale, 10 * scale, 4 * scale);
+      ctx.fillStyle = '#ff1493';
+      ctx.fillRect(6 * scale, 6 * scale, 4 * scale, 2 * scale);
+    } else if (tileType === 4) {
+      // Hazard / Kid-Friendly Sparkle Spikes (Non-lethal star barrier)
+      ctx.fillStyle = '#ff0055';
+      ctx.fillRect(2 * scale, 10 * scale, 4 * scale, 6 * scale);
+      ctx.fillRect(6 * scale, 6 * scale, 4 * scale, 10 * scale);
+      ctx.fillRect(10 * scale, 10 * scale, 4 * scale, 6 * scale);
+      ctx.fillStyle = '#ffe600';
+      ctx.fillRect(7 * scale, 4 * scale, 2 * scale, 2 * scale);
+    }
+
+    ctx.restore();
+  }
+}
+
+window.SpriteRenderer = SpriteRenderer;

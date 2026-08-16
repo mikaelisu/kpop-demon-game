@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>K-Pop Demon Hunters: 8-Bit Ramen Rush</title>
+  <meta name="description" content="A vibrant 8-bit NES style action platformer about K-Pop Demon Hunters who eat ramen and fight demons with glowing neon swords. Built for young kids with touch screen controls!">
+  
+  <!-- Retro Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game-wrapper">
+    <!-- Retro Arcade Bezel Container -->
+    <div id="arcade-bezel">
+      <!-- Header Banner (Desktop / Tablet) -->
+      <header id="arcade-header">
+        <div class="header-decor left-star">⭐</div>
+        <div class="header-title">
+          <span class="neon-pink">K-POP</span> 
+          <span class="neon-cyan">DEMON</span> 
+          <span class="neon-yellow">HUNTERS</span>
+          <span class="subtitle">🍜 8-BIT RAMEN RUSH ⚔️</span>
+        </div>
+        <div class="header-nav">
+          <button id="btn-nav-game" class="nav-pixel-btn active">🎮 GAME</button>
+          <button id="btn-nav-minigame" class="nav-pixel-btn">🍜 RAMEN CATCH</button>
+          <button id="btn-nav-album" class="nav-pixel-btn">📸 PHOTOCARDS</button>
+        </div>
+        <div class="header-decor right-star">⭐</div>
+      </header>
+
+      <!-- Main Canvas Screen Area -->
+      <div id="screen-container">
+        <canvas id="game-canvas" width="384" height="216"></canvas>
+        
+        <!-- CRT Scanline & Phosphor Glow Overlay -->
+        <div id="crt-overlay" class="crt-enabled"></div>
+
+        <!-- Touch Controls Overlay (Always active for touch / can be toggled) -->
+        <div id="touch-controls" class="touch-active">
+          <!-- Left D-Pad -->
+          <div id="touch-dpad">
+            <button id="btn-touch-up" class="touch-btn dpad-btn" data-key="ArrowUp" aria-label="Up / Cling">▲</button>
+            <div class="dpad-row">
+              <button id="btn-touch-left" class="touch-btn dpad-btn" data-key="ArrowLeft" aria-label="Left">◀</button>
+              <div class="dpad-center">🍜</div>
+              <button id="btn-touch-right" class="touch-btn dpad-btn" data-key="ArrowRight" aria-label="Right">▶</button>
+            </div>
+            <button id="btn-touch-down" class="touch-btn dpad-btn" data-key="ArrowDown" aria-label="Down / Crouch">▼</button>
+          </div>
+
+          <!-- Quick Assist Button (Top Center for young kids) -->
+          <div id="touch-top-bar">
+            <button id="btn-touch-slurp" class="touch-btn slurp-btn" data-key="KeyC" aria-label="Eat Ramen Special">
+              <span class="btn-icon">🍜</span>
+              <span class="btn-label">SLURP!</span>
+            </button>
+            <button id="btn-touch-pause" class="touch-btn pause-btn" data-key="KeyP" aria-label="Pause Menu">
+              <span class="btn-icon">⏸️</span>
+            </button>
+          </div>
+
+          <!-- Right Action Buttons -->
+          <div id="touch-actions">
+            <button id="btn-touch-attack" class="touch-btn action-btn attack-btn" data-key="KeyZ" aria-label="Glowing Sword Attack">
+              <span class="btn-icon">⚔️</span>
+              <span class="btn-label">SLASH</span>
+            </button>
+            <button id="btn-touch-jump" class="touch-btn action-btn jump-btn" data-key="KeyX" aria-label="Jump / Bounce">
+              <span class="btn-icon">🦘</span>
+              <span class="btn-label">JUMP</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Audio Enable Banner (For mobile browser Web Audio autoplay policy) -->
+        <div id="audio-start-prompt" class="overlay-prompt">
+          <div class="prompt-box">
+            <div class="prompt-icon">✨ 🍜 ⚔️ 🎶</div>
+            <h2>TAP SCREEN TO START!</h2>
+            <p>Turn on 8-Bit K-Pop Chiptune Sound & Join the Concert!</p>
+            <button id="btn-start-audio" class="pixel-btn pulse-glow">START GAME</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Quick Info Bar -->
+      <footer id="arcade-footer">
+        <div class="footer-info">
+          <span>⌨️ <b>Keyboard:</b> WASD/Arrows (Move) | <b>Z:</b> Slash | <b>X:</b> Jump | <b>C:</b> Ramen Super | <b>P:</b> Pause</span>
+          <span>🎮 <b>Gamepad:</b> D-Pad/Stick + A/B/X</span>
+        </div>
+        <div class="footer-toggles">
+          <button id="toggle-crt" class="tiny-btn" title="Toggle 8-Bit CRT Scanlines">CRT: ON</button>
+          <button id="toggle-sound" class="tiny-btn" title="Toggle Sound">MUTE</button>
+          <button id="toggle-assist" class="tiny-btn assist-indicator" title="Kid Assist Mode Settings">👶 ASSIST: ON</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/graphics/palette.js"></script>
+  <script src="js/graphics/sprites.js"></script>
+  <script src="js/audio/chiptune.js"></script>
+  <script src="js/audio/sfx.js"></script>
+  <script src="js/audio/music.js"></script>
+  <script src="js/engine/input.js"></script>
+  <script src="js/engine/particles.js"></script>
+  <script src="js/engine/physics.js"></script>
+  <script src="js/engine/camera.js"></script>
+  <script src="js/entities/collectible.js"></script>
+  <script src="js/entities/enemy.js"></script>
+  <script src="js/entities/boss.js"></script>
+  <script src="js/entities/player.js"></script>
+  <script src="js/levels/level_data.js"></script>
+  <script src="js/levels/level_manager.js"></script>
+  <script src="js/ui/hud.js"></script>
+  <script src="js/ui/menus.js"></script>
+  <script src="js/ui/album.js"></script>
+  <script src="js/ui/ramen_game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
