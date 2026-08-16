@@ -3,8 +3,8 @@
  */
 
 class Player {
-  constructor(charId = 'luna') {
-    this.charId = charId; // 'luna', 'minho', 'hana', 'felix'
+  constructor(charId = 'rumi') {
+    this.charId = charId; // 'rumi', 'mira', 'zoey', 'jinu'
     this.x = 60;
     this.y = 120;
     this.width = 28;
@@ -13,8 +13,8 @@ class Player {
     this.vy = 0;
 
     // Movement speeds
-    this.speed = 3.2;
-    this.jumpForce = -7.6;
+    this.speed = 3.4;
+    this.jumpForce = -8.5; // High, crisp, responsive jump!
     this.facingRight = true;
     this.state = 'idle'; // 'idle', 'run', 'jump', 'fall', 'wall_cling', 'attack', 'slurp', 'hurt', 'victory'
 
@@ -69,13 +69,13 @@ class Player {
 
     // Coyote Time & Jump Buffering
     if (this.onGround) {
-      this.coyoteTimer = 0.15;
+      this.coyoteTimer = 0.22; // 0.22s Coyote Time
     } else if (this.coyoteTimer > 0) {
       this.coyoteTimer -= dt;
     }
 
-    if (input.justJump()) {
-      this.jumpBufferTimer = 0.15;
+    if (input.justJump() || (input.isJump() && this.onGround && this.vy >= 0)) {
+      this.jumpBufferTimer = 0.22;
     } else if (this.jumpBufferTimer > 0) {
       this.jumpBufferTimer -= dt;
     }
@@ -123,24 +123,25 @@ class Player {
       this.wallClingDir = this.touchingWallLeft ? -1 : 1;
     }
 
-    // Jump & Wall Kick
+    // Jump & Wall Kick (Instant, smooth, forgiving)
     if (this.jumpBufferTimer > 0) {
-      if (this.coyoteTimer > 0) {
+      if (this.coyoteTimer > 0 || this.onGround) {
         // Normal Jump
         this.vy = this.jumpForce;
         this.onGround = false;
         this.coyoteTimer = 0;
         this.jumpBufferTimer = 0;
+        this.state = 'jump';
         if (sfx) sfx.playJump();
       } else if (this.state === 'wall_cling') {
         // Ninja Wall Kick!
         this.vy = this.jumpForce * 0.95;
-        this.vx = -this.wallClingDir * this.speed * 1.2;
+        this.vx = -this.wallClingDir * this.speed * 1.3;
         this.facingRight = this.wallClingDir < 0;
         this.state = 'jump';
         this.jumpBufferTimer = 0;
         if (sfx) sfx.playWallKick();
-        if (particles) particles.spawnSparkleBurst(this.x + 12, this.y + 20, 6, '#00f0ff');
+        if (particles) particles.spawnSparkleBurst(this.x + 12, this.y + 20, 8, '#00f0ff');
       }
     }
 
@@ -222,10 +223,10 @@ class Player {
   getSwordColor() {
     if (this.spicyTimer > 0) return '#ff3300';
     if (this.rainbowFeverTimer > 0) return '#ffe600';
-    if (this.charId === 'minho') return '#ffaa00';
-    if (this.charId === 'hana') return '#ff1493';
-    if (this.charId === 'felix') return '#cc00ff';
-    return '#00f0ff'; // Luna cyan
+    if (this.charId === 'mira' || this.charId === 'minho') return '#ffaa00';
+    if (this.charId === 'zoey' || this.charId === 'hana') return '#ff1493';
+    if (this.charId === 'jinu' || this.charId === 'felix') return '#cc00ff';
+    return '#00f0ff'; // Rumi cyan
   }
 
   getSwordHitbox() {

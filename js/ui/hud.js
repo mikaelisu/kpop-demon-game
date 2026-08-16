@@ -93,7 +93,7 @@ class HUD {
       // Boss Name
       ctx.fillStyle = '#ffe600';
       ctx.font = "7px 'Press Start 2P', monospace";
-      const bName = boss.type === 'shadow_king' ? 'SHADOW DEMON KING' : (boss.type === 'ramen_fiend' ? 'GIANT RAMEN FIEND' : 'DJ DOKKAEBI');
+      const bName = (boss.type === 'gwi_ma' || boss.type === 'shadow_king') ? 'GWI-MA (DEMON KING)' : (boss.type === 'ramen_fiend' ? 'GIANT RAMEN FIEND' : 'DJ DOKKAEBI');
       ctx.fillText(bName, bX + 4, bY - 3);
 
       // HP Fill

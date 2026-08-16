@@ -39,6 +39,20 @@ class PhysicsEngine {
     // Vertical Movement & Collision
     entity.y += entity.vy;
     this.resolveVerticalCollisions(entity, tilemap, tileSize);
+
+    // Pit Safety & Bottom Stage Boundary Check
+    const mapBottom = (tilemap.rows || 12) * tileSize;
+    if (entity.y > mapBottom + 30) {
+      if (entity.charId) {
+        // Player pit recovery: Bounce back to nearest platform height or start position
+        entity.y = Math.min(entity.y, mapBottom - entity.height - 4);
+        entity.vy = -7.5;
+        entity.onGround = true;
+        if (entity.takeDamage && !entity.assistInvincible) {
+          entity.takeDamage(1);
+        }
+      }
+    }
   }
 
   resolveHorizontalCollisions(entity, tilemap, tileSize) {

@@ -202,24 +202,24 @@ class SpriteRenderer {
       ctx.translate(-24 * scale, 0);
     }
 
-    // Color definitions per Idol
-    let hairColor = '#ff77bb';
+    // Color definitions per Demon Hunter
+    let hairColor = '#ff55aa';
     let outfitColor1 = '#ffffff';
     let outfitColor2 = '#00f0ff';
     let swordColor = '#00f0ff';
     let skinColor = '#ffe0bd';
 
-    if (charId === 'minho') {
+    if (charId === 'mira' || charId === 'minho') {
       hairColor = '#3a2618';
       outfitColor1 = '#ff4400';
       outfitColor2 = '#222222';
       swordColor = '#ffaa00';
-    } else if (charId === 'hana') {
+    } else if (charId === 'zoey' || charId === 'hana') {
       hairColor = '#ffe600';
       outfitColor1 = '#ff007f';
       outfitColor2 = '#ffffff';
       swordColor = '#ff1493';
-    } else if (charId === 'felix') {
+    } else if (charId === 'jinu' || charId === 'felix') {
       hairColor = '#88ddff';
       outfitColor1 = '#9900ff';
       outfitColor2 = '#111122';
@@ -262,19 +262,19 @@ class SpriteRenderer {
 
     // 1. Hair & Head Accessory
     ctx.fillStyle = hairColor;
-    // Hair buns / idol hair style
-    if (charId === 'luna') {
-      // Double anime buns
+    // Hair style per Hunter
+    if (charId === 'rumi' || charId === 'luna') {
+      // Rumi: Double anime space buns & bangs
       ctx.fillRect(6 * scale, (headY - 3) * scale, 3 * scale, 3 * scale);
       ctx.fillRect(15 * scale, (headY - 3) * scale, 3 * scale, 3 * scale);
       ctx.fillRect(7 * scale, headY * scale, 10 * scale, 6 * scale);
-    } else if (charId === 'minho') {
-      // Cool spiked idol hair
+    } else if (charId === 'mira' || charId === 'minho') {
+      // Mira: Cool dancer layered haircut & headband
       ctx.fillRect(7 * scale, (headY - 2) * scale, 10 * scale, 6 * scale);
       ctx.fillRect(5 * scale, (headY - 1) * scale, 3 * scale, 3 * scale);
       ctx.fillRect(16 * scale, (headY - 1) * scale, 3 * scale, 3 * scale);
-    } else if (charId === 'hana') {
-      // Twin high ponytails with star clips
+    } else if (charId === 'zoey' || charId === 'hana') {
+      // Zoey: Twin high ponytails with star hairclips
       ctx.fillRect(5 * scale, (headY - 3) * scale, 3 * scale, 5 * scale);
       ctx.fillRect(16 * scale, (headY - 3) * scale, 3 * scale, 5 * scale);
       ctx.fillRect(7 * scale, headY * scale, 10 * scale, 6 * scale);
@@ -283,7 +283,7 @@ class SpriteRenderer {
       ctx.fillRect(6 * scale, (headY - 1) * scale, 2 * scale, 2 * scale);
       ctx.fillStyle = hairColor;
     } else {
-      // Felix side-swept waves
+      // Jinu: Saja Boys idol styled side-swept waves
       ctx.fillRect(7 * scale, (headY - 2) * scale, 11 * scale, 6 * scale);
       ctx.fillRect(16 * scale, headY * scale, 3 * scale, 4 * scale);
     }

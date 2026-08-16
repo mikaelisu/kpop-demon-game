@@ -6,11 +6,11 @@ An authentic 8-bit NES-style 2D side-scrolling action platformer inspired by cla
 
 ## 🌟 Features
 
-- **4 Playable K-Pop Idol Demon Hunters**:
-  - **Luna** (*Moonlight Blade*): Agile leader with a glowing Cyan Katana and crescent slashes.
-  - **Minho** (*Flame Beat*): Power strike idol with a Golden Greatsword and spicy ground-pound shockwaves.
-  - **Hana** (*Star Pop*): Vocalist with Twin Pink Star Daggers and rapid cyclone spins.
-  - **Felix** (*Thunder Rhythm*): Acrobat with a Violet Lightning Blade and ninja somersaults.
+- **4 Playable K-Pop Demon Hunters**:
+  - **Rumi** (*HUNTR/X Leader*): Charismatic leader with a glowing Cyan Saingeom Blade, fast crescent slashes, and high agility.
+  - **Mira** (*HUNTR/X Main Dancer*): Power strike dancer with a Golden Flame Gokdo Blade and spicy ground-pound shockwaves.
+  - **Zoey** (*HUNTR/X Main Rapper & Maknae*): High-speed vocalist with Twin Pink Star Shinkal Daggers and spinning cyclone strikes.
+  - **Jinu** (*Saja Boys Leader*): Saja Boys idol and demon hunter with a Violet Lightning Blade and somersault acrobatics.
 
 - **🍜 Delicious Ramen Power-Up System**:
   - **Shoyu Ramen**: Restores hearts and charges the Slurp Meter.
@@ -22,13 +22,13 @@ An authentic 8-bit NES-style 2D side-scrolling action platformer inspired by cla
   - **Playful Invincibility**: Young children never get frustrated — touching enemies or hazards makes the character bounce playfully with star sparkles rather than losing hearts.
   - **Bouncy Ramen Springs**: Launch high across platforms with springy boing sounds.
   - **Enemy Head Bouncing**: Landing on enemy heads automatically bounces the player upward.
-  - **Generous Forgiveness**: Built-in 0.15s Coyote Time and Jump Buffering.
+  - **Generous Forgiveness**: Built-in 0.22s Coyote Time, 0.22s Jump Buffering, and instant fluid jumping.
 
 - **🌆 4 Handcrafted Stages & 3 Boss Battles**:
   - **Stage 1**: Neon Night Market & Seoul Street (*Boss: DJ Dokkaebi*)
   - **Stage 2**: Haunted K-Pop Concert Dome (*Boss: DJ Dokkaebi Encore*)
   - **Stage 3**: Mystic Noodle Temple & Cherry Blossom Garden (*Boss: Giant Ramen Fiend*)
-  - **Stage 4**: Demon Castle Rooftops Climax (*Climax Boss: Shadow Idol Demon King*)
+  - **Stage 4**: Demon Castle Rooftops Climax (*Climax Boss: Gwi-Ma, The Demon King*)
 
 - **📸 K-Pop Photocard Binder & Minigame**:
   - Unlockable 8-bit holographic idol cards in the binder album.
@@ -42,12 +42,13 @@ An authentic 8-bit NES-style 2D side-scrolling action platformer inspired by cla
 
 ## 🕹️ Controls
 
-### 📱 Touch Screen (Mobile / Tablet)
+### 📱 Touch Screen (Mobile / Tablet - All Clustered on Left for Kids!)
 - **D-Pad (Left)**: Move Left / Right, Crouch Down, Cling Up
-- **⚔️ SLASH Button (Right)**: Glowing Sword Attack Combo
-- **🦘 JUMP Button (Right)**: Jump & Wall Kick
-- **🍜 SLURP Button (Top)**: Ramen Super Strike / Fever
-- **⏸️ PAUSE Button**: Pause Menu
+- **🦘 JUMP Button (Left Cluster)**: High, crisp springy jump & wall-kick
+- **⚔️ SLASH Button (Left Cluster)**: Glowing Sword Attack Combo
+- **🍜 SLURP Button (Left Cluster)**: Ramen Super Strike / Fever
+- **⏸️ PAUSE Button (Left Cluster)**: Pause Menu
+- *Kids can also tap the right half of the screen to jump or attack directly!*
 
 ### ⌨️ Keyboard
 - **Move**: `A / D` or `Left / Right Arrow`

@@ -9,10 +9,10 @@ class Boss {
     this.y = y;
     this.startX = x;
     this.startY = y;
-    this.type = type; // 'dj_dokkaebi', 'ramen_fiend', 'shadow_king'
+    this.type = type; // 'dj_dokkaebi', 'ramen_fiend', 'gwi_ma', 'shadow_king'
     this.width = 60;
     this.height = 60;
-    this.maxHp = type === 'shadow_king' ? 12 : (type === 'ramen_fiend' ? 10 : 8);
+    this.maxHp = (type === 'gwi_ma' || type === 'shadow_king') ? 12 : (type === 'ramen_fiend' ? 10 : 8);
     this.hp = this.maxHp;
     this.facingRight = false;
     this.animTimer = 0;

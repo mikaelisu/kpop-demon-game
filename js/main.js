@@ -29,11 +29,15 @@ class GameApp {
     this.album = new PhotocardAlbum();
     this.ramenGame = new RamenMinigame();
 
-    // Global Game Audio Ref
+    // Global Game Audio & App Ref
     window.gameAudio = { synth: this.synth, sfx: this.sfx, music: this.music };
+    window.gameApp = this;
 
-    // App State: 'title', 'character_select', 'stage_select', 'playing', 'album', 'ramen_game', 'assist_settings', 'pause', 'game_over', 'game_win'
+    // App State & Cheats/Speed for QA & Testing
     this.state = 'title';
+    this.gameSpeed = 1.0;
+    this.godMode = false;
+    this.infiniteSlurp = false;
 
     this.lastTime = 0;
     this.isAudioStarted = false;
@@ -391,6 +395,19 @@ class GameApp {
       } else {
         this.state = 'title';
         this.menus.currentScreen = 'title';
+      }
+    } else if (this.state === 'playing') {
+      // Direct screen taps for toddlers: tap right side to jump/slash!
+      if (clickX > this.virtualWidth * 0.45) {
+        if (clickX > this.virtualWidth * 0.72) {
+          // Tap right -> Jump
+          this.input.setTouchKey('KeyX', true);
+          setTimeout(() => this.input.setTouchKey('KeyX', false), 120);
+        } else {
+          // Tap mid-right -> Slash
+          this.input.setTouchKey('KeyZ', true);
+          setTimeout(() => this.input.setTouchKey('KeyZ', false), 120);
+        }
       }
     } else if (this.state === 'title') {
       this.state = 'character_select';

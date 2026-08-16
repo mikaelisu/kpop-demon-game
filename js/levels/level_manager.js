@@ -141,20 +141,20 @@ class LevelManager {
 
       // Check Sword Slash Attack Hit
       const swordBox = player.getSwordHitbox();
-      if (swordBox && physics.checkOverlap(swordBox, enemy.getHitbox())) {
+      if (swordBox && !enemy.isHit && physics.checkOverlap(swordBox, enemy.getHitbox())) {
         enemy.takeDamage(player.spicyTimer > 0 ? 2 : 1, sfx, particles, this.collectibles);
         player.score += 200;
         player.addSlurpMeter(15);
       }
 
       // Check Rainbow Fever Auto-Defeat
-      else if (player.rainbowFeverTimer > 0 && physics.checkOverlap(player.getHitbox(), enemy.getHitbox())) {
+      else if (player.rainbowFeverTimer > 0 && !enemy.isHit && physics.checkOverlap(player.getHitbox(), enemy.getHitbox())) {
         enemy.takeDamage(3, sfx, particles, this.collectibles);
         player.score += 300;
       }
 
       // Check Player Landing / Bouncing on Enemy Head (Kid-Friendly Stomp!)
-      else if (player.vy > 0 && player.y + player.height <= enemy.y + 12 && physics.checkOverlap(player.getHitbox(), enemy.getHitbox())) {
+      else if (player.vy > 0 && !enemy.isHit && player.y + player.height <= enemy.y + 12 && physics.checkOverlap(player.getHitbox(), enemy.getHitbox())) {
         enemy.takeDamage(1, sfx, particles, this.collectibles);
         player.bounceOnEnemy(sfx, particles);
         player.score += 150;
@@ -173,14 +173,14 @@ class LevelManager {
       if (!this.boss.isDefeated) {
         // Sword Slash vs Boss
         const swordBox = player.getSwordHitbox();
-        if (swordBox && physics.checkOverlap(swordBox, this.boss.getHitbox())) {
+        if (swordBox && !this.boss.isHit && physics.checkOverlap(swordBox, this.boss.getHitbox())) {
           this.boss.takeDamage(1, sfx, particles, this.collectibles);
           player.score += 300;
           player.addSlurpMeter(20);
         }
 
         // Rainbow Fever vs Boss
-        else if (player.rainbowFeverTimer > 0 && physics.checkOverlap(player.getHitbox(), this.boss.getHitbox())) {
+        else if (player.rainbowFeverTimer > 0 && !this.boss.isHit && physics.checkOverlap(player.getHitbox(), this.boss.getHitbox())) {
           this.boss.takeDamage(2, sfx, particles, this.collectibles);
           player.bounceOnEnemy(sfx, particles);
         }

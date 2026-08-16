@@ -41,40 +41,43 @@
         <!-- CRT Scanline & Phosphor Glow Overlay -->
         <div id="crt-overlay" class="crt-enabled"></div>
 
-        <!-- Touch Controls Overlay (Always active for touch / can be toggled) -->
-        <div id="touch-controls" class="touch-active">
-          <!-- Left D-Pad -->
-          <div id="touch-dpad">
-            <button id="btn-touch-up" class="touch-btn dpad-btn" data-key="ArrowUp" aria-label="Up / Cling">▲</button>
-            <div class="dpad-row">
-              <button id="btn-touch-left" class="touch-btn dpad-btn" data-key="ArrowLeft" aria-label="Left">◀</button>
-              <div class="dpad-center">🍜</div>
-              <button id="btn-touch-right" class="touch-btn dpad-btn" data-key="ArrowRight" aria-label="Right">▶</button>
+        <!-- Touch Controls Overlay (All Clustered on Left Side for Easy 4-Year-Old Access) -->
+        <div id="touch-controls" class="touch-active touch-left-cluster">
+          <!-- Left Control Station: D-Pad + Action Buttons grouped together -->
+          <div id="left-controls-cluster">
+            <!-- D-Pad -->
+            <div id="touch-dpad">
+              <button id="btn-touch-up" class="touch-btn dpad-btn" data-key="ArrowUp" aria-label="Up / Cling">▲</button>
+              <div class="dpad-row">
+                <button id="btn-touch-left" class="touch-btn dpad-btn" data-key="ArrowLeft" aria-label="Left">◀</button>
+                <div class="dpad-center">🍜</div>
+                <button id="btn-touch-right" class="touch-btn dpad-btn" data-key="ArrowRight" aria-label="Right">▶</button>
+              </div>
+              <button id="btn-touch-down" class="touch-btn dpad-btn" data-key="ArrowDown" aria-label="Down / Crouch">▼</button>
             </div>
-            <button id="btn-touch-down" class="touch-btn dpad-btn" data-key="ArrowDown" aria-label="Down / Crouch">▼</button>
-          </div>
 
-          <!-- Quick Assist Button (Top Center for young kids) -->
-          <div id="touch-top-bar">
-            <button id="btn-touch-slurp" class="touch-btn slurp-btn" data-key="KeyC" aria-label="Eat Ramen Special">
-              <span class="btn-icon">🍜</span>
-              <span class="btn-label">SLURP!</span>
-            </button>
-            <button id="btn-touch-pause" class="touch-btn pause-btn" data-key="KeyP" aria-label="Pause Menu">
-              <span class="btn-icon">⏸️</span>
-            </button>
-          </div>
-
-          <!-- Right Action Buttons -->
-          <div id="touch-actions">
-            <button id="btn-touch-attack" class="touch-btn action-btn attack-btn" data-key="KeyZ" aria-label="Glowing Sword Attack">
-              <span class="btn-icon">⚔️</span>
-              <span class="btn-label">SLASH</span>
-            </button>
-            <button id="btn-touch-jump" class="touch-btn action-btn jump-btn" data-key="KeyX" aria-label="Jump / Bounce">
-              <span class="btn-icon">🦘</span>
-              <span class="btn-label">JUMP</span>
-            </button>
+            <!-- Action Buttons Clustered on Left -->
+            <div id="touch-actions-left">
+              <div class="action-row-top">
+                <button id="btn-touch-jump" class="touch-btn action-btn jump-btn" data-key="KeyX" aria-label="Jump / Bounce">
+                  <span class="btn-icon">🦘</span>
+                  <span class="btn-label">JUMP</span>
+                </button>
+                <button id="btn-touch-attack" class="touch-btn action-btn attack-btn" data-key="KeyZ" aria-label="Glowing Sword Attack">
+                  <span class="btn-icon">⚔️</span>
+                  <span class="btn-label">SLASH</span>
+                </button>
+              </div>
+              <div class="action-row-bottom">
+                <button id="btn-touch-slurp" class="touch-btn slurp-btn" data-key="KeyC" aria-label="Eat Ramen Special">
+                  <span class="btn-icon">🍜</span>
+                  <span class="btn-label">SLURP!</span>
+                </button>
+                <button id="btn-touch-pause" class="touch-btn pause-btn" data-key="KeyP" aria-label="Pause Menu">
+                  <span class="btn-icon">⏸️</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

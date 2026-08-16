@@ -23,33 +23,33 @@ const NES_PALETTE = [
 
 // Special Cyber K-Pop & Ramen Glow Palette
 const GLOW_PALETTE = {
-  // Luna (Moonlight Agility)
-  LUNA_HAIR: '#ff77bb',
-  LUNA_OUTFIT_1: '#ffffff',
-  LUNA_OUTFIT_2: '#00f0ff',
-  LUNA_SWORD: '#00f0ff',
-  LUNA_AURA: 'rgba(0, 240, 255, 0.6)',
+  // Rumi (HUNTR/X Leader - Cyan / Hot Pink Neon Blade)
+  RUMI_HAIR: '#ff55aa',
+  RUMI_OUTFIT_1: '#ffffff',
+  RUMI_OUTFIT_2: '#00f0ff',
+  RUMI_SWORD: '#00f0ff',
+  RUMI_AURA: 'rgba(0, 240, 255, 0.6)',
 
-  // Minho (Flame Beat Power)
-  MINHO_HAIR: '#332211',
-  MINHO_OUTFIT_1: '#ff4400',
-  MINHO_OUTFIT_2: '#222222',
-  MINHO_SWORD: '#ffaa00',
-  MINHO_AURA: 'rgba(255, 170, 0, 0.6)',
+  // Mira (HUNTR/X Main Dancer - Flame Gokdo Blade)
+  MIRA_HAIR: '#332211',
+  MIRA_OUTFIT_1: '#ff4400',
+  MIRA_OUTFIT_2: '#222222',
+  MIRA_SWORD: '#ffaa00',
+  MIRA_AURA: 'rgba(255, 170, 0, 0.6)',
 
-  // Hana (Star Pop Magic)
-  HANA_HAIR: '#ffdd00',
-  HANA_OUTFIT_1: '#ff007f',
-  HANA_OUTFIT_2: '#ffffff',
-  HANA_SWORD: '#ff1493',
-  HANA_AURA: 'rgba(255, 20, 147, 0.6)',
+  // Zoey (HUNTR/X Main Rapper & Maknae - Twin Shinkal Daggers)
+  ZOEY_HAIR: '#ffdd00',
+  ZOEY_OUTFIT_1: '#ff007f',
+  ZOEY_OUTFIT_2: '#ffffff',
+  ZOEY_SWORD: '#ff1493',
+  ZOEY_AURA: 'rgba(255, 20, 147, 0.6)',
 
-  // Felix (Thunder Rhythm Acrobat)
-  FELIX_HAIR: '#88ddff',
-  FELIX_OUTFIT_1: '#9900ff',
-  FELIX_OUTFIT_2: '#111122',
-  FELIX_SWORD: '#cc00ff',
-  FELIX_AURA: 'rgba(204, 0, 255, 0.6)',
+  // Jinu (Saja Boys Leader & Demon Hunter - Violet Lightning Blade)
+  JINU_HAIR: '#88ddff',
+  JINU_OUTFIT_1: '#9900ff',
+  JINU_OUTFIT_2: '#111122',
+  JINU_SWORD: '#cc00ff',
+  JINU_AURA: 'rgba(204, 0, 255, 0.6)',
 
   // Ramen & Powerups
   RAMEN_BOWL: '#d22d2d',
@@ -76,7 +76,7 @@ const GLOW_PALETTE = {
   // Bosses
   DJ_DOKKAEBI: '#2a9d8f',
   RAMEN_FIEND: '#e76f51',
-  SHADOW_KING: '#480ca8',
+  GWI_MA: '#480ca8',
   NEON_GOLD: '#ffe600',
   NEON_CYAN: '#00f0ff',
   NEON_MAGENTA: '#ff007f'

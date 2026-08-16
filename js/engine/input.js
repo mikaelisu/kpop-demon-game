@@ -19,6 +19,18 @@ class InputManager {
     };
     this.prevTouchState = { ...this.touchState };
 
+    this.injectedState = {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      jump: false,
+      attack: false,
+      slurp: false,
+      pause: false
+    };
+    this.prevInjectedState = { ...this.injectedState };
+
     this.activeTouches = new Map(); // id -> button element
     this.initKeyboard();
     this.initTouch();
@@ -133,66 +145,106 @@ class InputManager {
   update() {
     this.prevKeys = { ...this.keys };
     this.prevTouchState = { ...this.touchState };
+    this.prevInjectedState = { ...this.injectedState };
     this.pollGamepad();
   }
 
   // Direction checks
   isLeft() {
-    return !!(this.keys['ArrowLeft'] || this.keys['KeyA'] || this.touchState.left);
+    return !!(this.keys['ArrowLeft'] || this.keys['KeyA'] || this.touchState.left || this.injectedState.left);
   }
 
   isRight() {
-    return !!(this.keys['ArrowRight'] || this.keys['KeyD'] || this.touchState.right);
+    return !!(this.keys['ArrowRight'] || this.keys['KeyD'] || this.touchState.right || this.injectedState.right);
   }
 
   isUp() {
-    return !!(this.keys['ArrowUp'] || this.keys['KeyW'] || this.touchState.up);
+    return !!(this.keys['ArrowUp'] || this.keys['KeyW'] || this.touchState.up || this.injectedState.up);
   }
 
   isDown() {
-    return !!(this.keys['ArrowDown'] || this.keys['KeyS'] || this.touchState.down);
+    return !!(this.keys['ArrowDown'] || this.keys['KeyS'] || this.touchState.down || this.injectedState.down);
   }
 
   // Action checks (held)
   isJump() {
-    return !!(this.keys['KeyX'] || this.keys['KeyK'] || this.keys['Space'] || this.keys['ArrowUp'] || this.touchState.jump);
+    return !!(this.keys['KeyX'] || this.keys['KeyK'] || this.keys['Space'] || this.touchState.jump || this.injectedState.jump);
   }
 
   isAttack() {
-    return !!(this.keys['KeyZ'] || this.keys['KeyJ'] || this.touchState.attack);
+    return !!(this.keys['KeyZ'] || this.keys['KeyJ'] || this.touchState.attack || this.injectedState.attack);
   }
 
   isSlurp() {
-    return !!(this.keys['KeyC'] || this.keys['KeyL'] || this.touchState.slurp);
+    return !!(this.keys['KeyC'] || this.keys['KeyL'] || this.touchState.slurp || this.injectedState.slurp);
   }
 
   isPause() {
-    return !!(this.keys['KeyP'] || this.keys['Escape'] || this.touchState.pause);
+    return !!(this.keys['KeyP'] || this.keys['Escape'] || this.touchState.pause || this.injectedState.pause);
   }
 
   // Action checks (just pressed this frame)
+  justLeft() {
+    const now = this.isLeft();
+    const prev = !!(this.prevKeys['ArrowLeft'] || this.prevKeys['KeyA'] || this.prevTouchState.left || this.prevInjectedState.left);
+    return now && !prev;
+  }
+
+  justRight() {
+    const now = this.isRight();
+    const prev = !!(this.prevKeys['ArrowRight'] || this.prevKeys['KeyD'] || this.prevTouchState.right || this.prevInjectedState.right);
+    return now && !prev;
+  }
+
+  justUp() {
+    const now = this.isUp();
+    const prev = !!(this.prevKeys['ArrowUp'] || this.prevKeys['KeyW'] || this.prevTouchState.up || this.prevInjectedState.up);
+    return now && !prev;
+  }
+
+  justDown() {
+    const now = this.isDown();
+    const prev = !!(this.prevKeys['ArrowDown'] || this.prevKeys['KeyS'] || this.prevTouchState.down || this.prevInjectedState.down);
+    return now && !prev;
+  }
+
   justJump() {
     const now = this.isJump();
-    const prev = !!(this.prevKeys['KeyX'] || this.prevKeys['KeyK'] || this.prevKeys['Space'] || this.prevKeys['ArrowUp'] || this.prevTouchState.jump);
+    const prev = !!(this.prevKeys['KeyX'] || this.prevKeys['KeyK'] || this.prevKeys['Space'] || this.prevTouchState.jump || this.prevInjectedState.jump);
     return now && !prev;
   }
 
   justAttack() {
     const now = this.isAttack();
-    const prev = !!(this.prevKeys['KeyZ'] || this.prevKeys['KeyJ'] || this.prevTouchState.attack);
+    const prev = !!(this.prevKeys['KeyZ'] || this.prevKeys['KeyJ'] || this.prevTouchState.attack || this.prevInjectedState.attack);
     return now && !prev;
   }
 
   justSlurp() {
     const now = this.isSlurp();
-    const prev = !!(this.prevKeys['KeyC'] || this.prevKeys['KeyL'] || this.prevTouchState.slurp);
+    const prev = !!(this.prevKeys['KeyC'] || this.prevKeys['KeyL'] || this.prevTouchState.slurp || this.prevInjectedState.slurp);
     return now && !prev;
   }
 
   justPause() {
     const now = this.isPause();
-    const prev = !!(this.prevKeys['KeyP'] || this.prevKeys['Escape'] || this.prevTouchState.pause);
+    const prev = !!(this.prevKeys['KeyP'] || this.prevKeys['Escape'] || this.prevTouchState.pause || this.prevInjectedState.pause);
     return now && !prev;
+  }
+
+  // =========================================================================
+  // Test Agent Input Injection Hooks
+  // =========================================================================
+  setInjectedInput(action, state) {
+    if (this.injectedState.hasOwnProperty(action)) {
+      this.injectedState[action] = !!state;
+    }
+  }
+
+  clearInjectedInputs() {
+    Object.keys(this.injectedState).forEach(k => {
+      this.injectedState[k] = false;
+    });
   }
 }
 

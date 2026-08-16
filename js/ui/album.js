@@ -10,12 +10,12 @@ class PhotocardAlbum {
     this.animTimer = 0;
 
     this.cards = [
-      { id: 'luna', name: 'LUNA ★ MOONLIGHT', role: 'Leader & Lead Dancer', quote: '"One slash, one beat, infinite light!"', color: '#00f0ff', rarity: '★★★ SSR' },
-      { id: 'minho', name: 'MINHO ★ FLAME BEAT', role: 'Main Rapper & Power Strike', quote: '"Extra spicy ramen gives me demonic strength!"', color: '#ffaa00', rarity: '★★★ SSR' },
-      { id: 'hana', name: 'HANA ★ STAR POP', role: 'Main Vocal & Twin Daggers', quote: '"My glowsticks will brighten the whole universe!"', color: '#ff1493', rarity: '★★★ SSR' },
-      { id: 'felix', name: 'FELIX ★ THUNDER', role: 'Lead Rapper & Acrobatics', quote: '"Feel the rhythm, strike like lightning!"', color: '#cc00ff', rarity: '★★★ SSR' },
+      { id: 'rumi', name: 'RUMI ★ MOONLIGHT', role: 'HUNTR/X Leader & Vocalist', quote: '"Our beats and blades will banish every demon!"', color: '#00f0ff', rarity: '★★★ SSR' },
+      { id: 'mira', name: 'MIRA ★ FLAME DANCER', role: 'HUNTR/X Main Dancer & Gokdo', quote: '"Extra spicy ramen gives me unstoppable power!"', color: '#ffaa00', rarity: '★★★ SSR' },
+      { id: 'zoey', name: 'ZOEY ★ STAR MAKNAE', role: 'HUNTR/X Main Rapper & Shinkal', quote: '"Catch these light daggers and shining star notes!"', color: '#ff1493', rarity: '★★★ SSR' },
+      { id: 'jinu', name: 'JINU ★ SAJA LEADER', role: 'Saja Boys Leader & Demon Hunter', quote: '"Feel the electric rhythm, strike with honor!"', color: '#cc00ff', rarity: '★★★ SSR' },
       { id: 'dj_dokkaebi', name: 'DJ DOKKAEBI', role: 'Beats Goblin Producer', quote: '"Drop the beat and pass the noodles!"', color: '#2a9d8f', rarity: '★★ SR' },
-      { id: 'golden_ramen', name: 'GOLDEN RAMEN MASTER', role: 'Legendary Powerup', quote: '"The ultimate noodle bowl of pure fever!"', color: '#ffd700', rarity: '★★★★ UR' }
+      { id: 'golden_ramen', name: 'GOLDEN RAMEN MASTER', role: 'Legendary Powerup', quote: '"The ultimate noodle bowl of pure rainbow fever!"', color: '#ffd700', rarity: '★★★★ UR' }
     ];
   }
 

@@ -12,10 +12,10 @@ class MenuManager {
     this.animTimer = 0;
 
     this.characters = [
-      { id: 'luna', name: 'LUNA', title: 'MOONLIGHT BLADE', color: '#00f0ff', sword: 'Cyan Glow Katana', desc: 'Fast & Agile! Slashes through demons with graceful neon crescent arcs.' },
-      { id: 'minho', name: 'MINHO', title: 'FLAME BEAT', color: '#ffaa00', sword: 'Golden Glow Greatsword', desc: 'Powerful ground slams & spicy ramen shockwaves!' },
-      { id: 'hana', name: 'HANA', title: 'STAR POP', color: '#ff1493', sword: 'Twin Neon Star Daggers', desc: 'High-speed spinning star slashes with sparkling K-Pop magic.' },
-      { id: 'felix', name: 'FELIX', title: 'THUNDER RHYTHM', color: '#cc00ff', sword: 'Violet Lightning Blade', desc: 'Acrobatic somersaults and lightning wall kicks!' }
+      { id: 'rumi', name: 'RUMI', title: 'HUNTR/X LEADER', color: '#00f0ff', sword: 'Cyan Glow Saingeom Blade', desc: 'Charismatic leader! Slashes demons with fast crescent neon arcs and high agility.' },
+      { id: 'mira', name: 'MIRA', title: 'HUNTR/X MAIN DANCER', color: '#ffaa00', sword: 'Golden Flame Gokdo Blade', desc: 'Powerful dancer strikes! Heavy slashes and spicy ramen shockwaves.' },
+      { id: 'zoey', name: 'ZOEY', title: 'HUNTR/X RAPPER & MAKNAE', color: '#ff1493', sword: 'Twin Neon Shinkal Daggers', desc: 'Fast & energetic! Rapid spinning star slashes with sparkling K-Pop magic.' },
+      { id: 'jinu', name: 'JINU', title: 'SAJA BOYS LEADER', color: '#cc00ff', sword: 'Violet Lightning Demon Blade', desc: 'Acrobatic somersaults, lightning wall-kicks, and demon sword slashes!' }
     ];
   }
 
@@ -91,7 +91,7 @@ class MenuManager {
     ctx.fillText("🍜 8-BIT RAMEN RUSH ⚔️", width / 2, 106);
 
     // 4 Idols Hopping Together
-    const idols = ['luna', 'minho', 'hana', 'felix'];
+    const idols = ['rumi', 'mira', 'zoey', 'jinu'];
     idols.forEach((id, idx) => {
       const hop = Math.abs(Math.sin(this.animTimer * 5 + idx)) * 6;
       spriteRenderer.drawPlayer(ctx, {
@@ -357,7 +357,7 @@ class MenuManager {
     ctx.fillText("ALL DEMONS PURIFIED WITH K-POP & RAMEN!", width / 2, 55);
 
     // All 4 Idols Dancing on Stage
-    const idols = ['luna', 'minho', 'hana', 'felix'];
+    const idols = ['rumi', 'mira', 'zoey', 'jinu'];
     idols.forEach((id, idx) => {
       const hop = Math.abs(Math.sin(this.animTimer * 6 + idx)) * 8;
       spriteRenderer.drawPlayer(ctx, {

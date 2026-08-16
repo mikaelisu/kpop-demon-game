@@ -255,7 +255,7 @@ const STAGES_DATA = [
     heightTiles: 12,
     tileSize: 32,
     playerStart: { x: 64, y: 220 },
-    bossType: "shadow_king",
+    bossType: "gwi_ma",
     bossSpawn: { x: 2400, y: 160 },
     arenaLockX: 2150,
 
