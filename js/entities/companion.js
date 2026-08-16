@@ -35,8 +35,8 @@ class CompanionManager {
         }
       }
 
-      // Hit Boss
-      if (!hit && boss && !boss.isDefeated && !boss.isHit && this.checkOverlap(p.getHitbox(), boss.getHitbox())) {
+      // Hit Boss (Only if Boss is active in arena!)
+      if (!hit && boss && boss.isActive && !boss.isDefeated && !boss.isHit && this.checkOverlap(p.getHitbox(), boss.getHitbox())) {
         boss.takeDamage(p.isSuper ? 2 : 1, sfx, particles, collectibles);
         if (particles) particles.spawnSparkleBurst(p.x, p.y, p.isSuper ? 16 : 10, '#00f0ff');
         p.life = 0;
@@ -145,6 +145,7 @@ class DemonCatCompanion {
 
       for (const enemy of enemies) {
         if (enemy.isDefeated) continue;
+        if (Math.abs(enemy.x - player.x) > 220 || Math.abs(enemy.y - player.y) > 160) continue;
         const d = Math.hypot(enemy.x - this.x, enemy.y - this.y);
         if (d < closestDist) {
           closestDist = d;
@@ -152,7 +153,7 @@ class DemonCatCompanion {
         }
       }
 
-      if (!target && boss && !boss.isDefeated) {
+      if (!target && boss && boss.isActive && !boss.isDefeated && Math.abs(boss.x - player.x) < 220) {
         const d = Math.hypot(boss.x - this.x, boss.y - this.y);
         if (d < closestDist) target = boss;
       }
@@ -261,6 +262,7 @@ class DemonRavenCompanion {
 
         for (const enemy of enemies) {
           if (enemy.isDefeated) continue;
+          if (Math.abs(enemy.x - player.x) > 220 || Math.abs(enemy.y - player.y) > 160) continue;
           const d = Math.hypot(enemy.x - this.x, enemy.y - this.y);
           if (d < closestDist) {
             closestDist = d;
@@ -268,7 +270,7 @@ class DemonRavenCompanion {
           }
         }
 
-        if (!target && boss && !boss.isDefeated) {
+        if (!target && boss && boss.isActive && !boss.isDefeated && Math.abs(boss.x - player.x) < 220) {
           const d = Math.hypot(boss.x - this.x, boss.y - this.y);
           if (d < closestDist) target = boss;
         }
@@ -322,7 +324,9 @@ class DemonRavenCompanion {
     this.diveProgress = 0;
     this.diveStartX = this.x;
     this.diveStartY = this.y;
-    this.diveTarget = boss && !boss.isDefeated ? boss : (enemies.find(e => !e.isDefeated) || { x: this.x + 150, y: this.y + 20 });
+    // Only target active boss or nearby enemy
+    const nearbyEnemy = enemies.find(e => !e.isDefeated && Math.abs(e.x - player.x) < 240);
+    this.diveTarget = (boss && boss.isActive && !boss.isDefeated) ? boss : (nearbyEnemy || { x: this.x + 150, y: this.y + 20 });
     this.diveTimer = 4.0;
     if (sfx) sfx.playWallKick();
     if (particles) particles.spawnSparkleBurst(this.x, this.y, 25, '#9d4edd');

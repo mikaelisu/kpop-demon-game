@@ -14,6 +14,7 @@ class Boss {
     this.height = 64;
     this.maxHp = (type === 'troll_king' || type === 'gwi_ma' || type === 'shadow_king') ? 12 : ((type === 'troll_chef' || type === 'ramen_fiend') ? 10 : 8);
     this.hp = this.maxHp;
+    this.isActive = false; // Only active once player enters boss arena
     this.facingRight = false;
     this.animTimer = 0;
     this.attackTimer = 2.5;
@@ -28,6 +29,8 @@ class Boss {
 
   update(dt, player, projectiles, particles, sfx, camera) {
     this.animTimer += dt;
+
+    if (!this.isActive) return;
 
     if (this.isHit) {
       this.hitTimer -= dt;
@@ -129,7 +132,7 @@ class Boss {
   }
 
   takeDamage(amount, sfx, particles, collectibles) {
-    if (this.isDefeated) return;
+    if (this.isDefeated || !this.isActive) return;
     this.hp -= amount;
     this.isHit = true;
     this.hitTimer = 0.2;

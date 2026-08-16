@@ -15,8 +15,10 @@ class LevelManager {
     this.companions = new CompanionManager();
     this.isArenaLocked = false;
     this.isStageCleared = false;
+    this.bossDefeated = false;
     this.clearTimer = 0;
     this.animTimer = 0;
+    this.goalX = 2000;
   }
 
   loadStage(stageIndex, player, camera, music) {
@@ -24,7 +26,9 @@ class LevelManager {
     this.stageData = STAGES_DATA[this.currentStageIndex];
     this.isStageCleared = false;
     this.isArenaLocked = false;
+    this.bossDefeated = false;
     this.clearTimer = 0;
+    this.goalX = (this.stageData.widthTiles - 2.5) * this.stageData.tileSize;
     if (this.companions) this.companions.projectiles = [];
 
     // Build Tilemap object
@@ -76,9 +80,10 @@ class LevelManager {
   update(dt, player, physics, sfx, particles, camera, music) {
     this.animTimer += dt;
 
-    // Check Boss Arena Lock
-    if (!this.isArenaLocked && player.x >= this.stageData.arenaLockX) {
+    // Check Boss Arena Lock (Only locks when reaching arena for the first time)
+    if (!this.isArenaLocked && !this.bossDefeated && player.x >= this.stageData.arenaLockX) {
       this.isArenaLocked = true;
+      if (this.boss) this.boss.isActive = true;
       camera.setBounds(this.stageData.arenaLockX - 60, 0, this.stageData.widthTiles * 32, this.stageData.heightTiles * 32);
       if (music) music.playTrack('boss');
       if (sfx) sfx.playBossRoar();
@@ -108,8 +113,8 @@ class LevelManager {
         }
       }
 
-      // Check collision with Boss
-      if (this.boss && !this.boss.isDefeated && physics.checkOverlap(p.getHitbox(), this.boss.getHitbox())) {
+      // Check collision with Boss (Only if Boss is active in arena!)
+      if (this.boss && this.boss.isActive && !this.boss.isDefeated && physics.checkOverlap(p.getHitbox(), this.boss.getHitbox())) {
         this.boss.takeDamage(2, sfx, particles, this.collectibles);
         p.life = 0;
       }
@@ -177,7 +182,7 @@ class LevelManager {
     if (this.boss) {
       this.boss.update(dt, player, this.enemyProjectiles, particles, sfx, camera);
 
-      if (!this.boss.isDefeated) {
+      if (this.boss.isActive && !this.boss.isDefeated) {
         // Sword Slash vs Boss
         const swordBox = player.getSwordHitbox();
         if (swordBox && !this.boss.isHit && physics.checkOverlap(swordBox, this.boss.getHitbox())) {
@@ -196,13 +201,15 @@ class LevelManager {
         else if (physics.checkOverlap(player.getHitbox(), this.boss.getHitbox())) {
           player.takeDamage(1, sfx, particles);
         }
-      } else if (!this.isStageCleared) {
-        // Boss defeated! Trigger victory state!
-        this.isStageCleared = true;
-        this.clearTimer = 4.0;
-        player.state = 'victory';
-        if (music) music.playTrack('victory');
-        if (particles) particles.spawnVictoryConfetti(player.x, player.y, 384);
+      } else if (this.boss.isDefeated && !this.bossDefeated) {
+        // Boss defeated! Unlock Arena so player can run right to the Goal Gate!
+        this.bossDefeated = true;
+        this.isArenaLocked = false;
+        const stagePixelWidth = this.stageData.widthTiles * this.stageData.tileSize;
+        const stagePixelHeight = this.stageData.heightTiles * this.stageData.tileSize;
+        camera.setBounds(0, 0, stagePixelWidth, stagePixelHeight);
+        if (music) music.playTrack(this.stageData.musicTrack);
+        if (particles) particles.spawnSparkleBurst(this.boss.x + 30, this.boss.y + 30, 30, '#ffd700');
       }
     }
 
@@ -210,7 +217,7 @@ class LevelManager {
     if (music) {
       if (player.rainbowFeverTimer > 0) {
         music.setTempoMultiplier(1.25);
-      } else if (this.boss && !this.boss.isDefeated && this.boss.hp <= this.boss.maxHp * 0.4) {
+      } else if (this.boss && this.boss.isActive && !this.boss.isDefeated && this.boss.hp <= this.boss.maxHp * 0.4) {
         music.setTempoMultiplier(1.20);
       } else {
         music.setTempoMultiplier(1.0);
@@ -234,7 +241,19 @@ class LevelManager {
       }
     }
 
-    // 6. Stage Clear Timer
+    // 6. Rightmost Finish Goal Gate Check (Stage ONLY completes when reaching the far right goal!)
+    const goalHitbox = { x: this.goalX - 16, y: 0, width: 64, height: this.stageData.heightTiles * 32 };
+    if (!this.isStageCleared && physics.checkOverlap(player.getHitbox(), goalHitbox)) {
+      if (this.bossDefeated || (this.boss && this.boss.isDefeated) || player.assistInvincible) {
+        this.isStageCleared = true;
+        this.clearTimer = 4.0;
+        player.state = 'victory';
+        if (music) music.playTrack('victory');
+        if (particles) particles.spawnVictoryConfetti(player.x, player.y, 384);
+      }
+    }
+
+    // 7. Stage Clear Timer Animation
     if (this.isStageCleared) {
       this.clearTimer -= dt;
       if (Math.random() < 0.2 && particles) {
@@ -392,6 +411,72 @@ class LevelManager {
     if (this.companions) {
       this.companions.draw(ctx, spriteRenderer, camera);
     }
+
+    // 7. Rightmost Golden Concert Stage Clear Goal Gate
+    this.drawGoalGate(ctx, camera);
+  }
+
+  drawGoalGate(ctx, camera) {
+    const screenX = Math.round(this.goalX - camera.x);
+    const groundY = Math.round(10 * 32 - camera.y);
+
+    ctx.save();
+
+    // Pulsing Rainbow Glow
+    const glow = Math.abs(Math.sin(this.animTimer * 4)) * 10;
+    ctx.shadowBlur = 12 + glow;
+
+    // Left & Right Neon Concert Truss Pillars
+    ctx.fillStyle = '#ff007f';
+    ctx.shadowColor = '#ff007f';
+    ctx.fillRect(screenX - 24, groundY - 80, 8, 80);
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowColor = '#00f0ff';
+    ctx.fillRect(screenX + 24, groundY - 80, 8, 80);
+
+    // Cross Beams & LED Bulbs
+    ctx.fillStyle = '#ffe600';
+    for (let i = 0; i < 5; i++) {
+      ctx.fillRect(screenX - 22, groundY - 16 - i * 14, 4, 4);
+      ctx.fillRect(screenX + 26, groundY - 16 - i * 14, 4, 4);
+    }
+
+    // Top Marquee Arch Header
+    ctx.fillStyle = '#18022a';
+    ctx.fillRect(screenX - 32, groundY - 96, 72, 20);
+    ctx.strokeStyle = '#ffe600';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(screenX - 32, groundY - 96, 72, 20);
+
+    ctx.fillStyle = '#ffe600';
+    ctx.shadowColor = '#ffd700';
+    ctx.font = "8px 'Press Start 2P', monospace";
+    ctx.textAlign = 'center';
+    ctx.fillText("★ GOAL ★", screenX + 4, groundY - 82);
+
+    // Center Spinning Hologram Portal
+    const bob = Math.sin(this.animTimer * 5) * 4;
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowColor = '#00f0ff';
+    ctx.beginPath();
+    ctx.arc(screenX + 4, groundY - 40 + bob, 16, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(screenX + 2, groundY - 42 + bob, 4, 4);
+
+    // If Boss is Defeated, Draw Flashing Neon Arrow Guiding Player to the Goal!
+    if (this.bossDefeated && !this.isStageCleared) {
+      const arrowFlash = Math.sin(this.animTimer * 8) > 0;
+      if (arrowFlash) {
+        ctx.fillStyle = '#ffe600';
+        ctx.shadowColor = '#ffe600';
+        ctx.font = "8px 'Press Start 2P', monospace";
+        ctx.fillText("▶ ▶ GO TO GOAL ▶ ▶", screenX + 4, groundY - 108);
+      }
+    }
+
+    ctx.restore();
   }
 }
 
